@@ -1,21 +1,13 @@
-import Link from "next/link";
+import { ButtonLink } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SurfaceCard } from "@/components/ui/surface-card";
 
 export function EmptyOutputState() {
   return (
     <section>
-      <div className="surface-card">
-        <div className="max-w-xl space-y-4">
-          <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
-            No HTML yet
-          </h1>
-          <Link
-            href="/mj-tool"
-            className="button button--primary"
-          >
-            Back to editor
-          </Link>
-        </div>
-      </div>
+      <SurfaceCard>
+        <EmptyState title="No HTML yet" action={<ButtonLink href="/mj-tool" variant="primary">Back to editor</ButtonLink>} />
+      </SurfaceCard>
     </section>
   );
 }

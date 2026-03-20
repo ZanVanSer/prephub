@@ -1,4 +1,6 @@
 import type { DeviceMode, PreviewTheme } from "@/modules/mj-tool/types/conversion";
+import { Button } from "@/components/ui/button";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 
 type PreviewPanelProps = {
   html: string;
@@ -30,46 +32,32 @@ export function PreviewPanel({
   return (
     <div className="mj-preview-panel xl:min-h-[760px]">
       <div className="mj-panel-header mj-panel-header--wrap">
-        <div className="mj-chip-group">
-          <button
-            type="button"
-            onClick={() => onDeviceModeChange("desktop")}
-            className={deviceMode === "desktop" ? "mj-chip mj-chip--active" : "mj-chip"}
-          >
-            Desktop
-          </button>
-          <button
-            type="button"
-            onClick={() => onDeviceModeChange("mobile")}
-            className={deviceMode === "mobile" ? "mj-chip mj-chip--active" : "mj-chip"}
-          >
-            Mobile
-          </button>
-        </div>
+        <SegmentedControl
+          items={[
+            { value: "desktop", label: "Desktop" },
+            { value: "mobile", label: "Mobile" },
+          ]}
+          value={deviceMode}
+          onChange={onDeviceModeChange}
+        />
 
-        <div className="mj-chip-group">
-          <button
-            type="button"
-            onClick={() => onPreviewThemeChange("light")}
-            className={previewTheme === "light" ? "mj-chip mj-chip--active" : "mj-chip"}
-          >
-            Light
-          </button>
-          <button
-            type="button"
-            onClick={() => onPreviewThemeChange("dark")}
-            className={previewTheme === "dark" ? "mj-chip mj-chip--active" : "mj-chip"}
-          >
-            Dark
-          </button>
-          <button
-            type="button"
+        <div className="flex flex-wrap gap-3">
+          <SegmentedControl
+            items={[
+              { value: "light", label: "Light" },
+              { value: "dark", label: "Dark" },
+            ]}
+            value={previewTheme}
+            onChange={onPreviewThemeChange}
+          />
+          <Button
+            variant="primary"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="mj-chip mj-chip--primary mj-chip--refresh disabled:cursor-not-allowed disabled:opacity-60"
+            className="ui-segmented__button ui-segmented__button--fixed-refresh px-0"
           >
-            {isRefreshing ? "Refreshing..." : "Refresh"}
-          </button>
+            <span className="truncate">{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+          </Button>
         </div>
       </div>
 

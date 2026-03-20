@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SurfaceCard } from "@/components/ui/surface-card";
 import { AnalysisCategoryCard } from "@/modules/mj-tool/components/analyzer/analysis-category-card";
 import { AnalysisEmptyState } from "@/modules/mj-tool/components/analyzer/analysis-empty-state";
 import { AnalysisStatCard } from "@/modules/mj-tool/components/analyzer/analysis-stat-card";
@@ -121,36 +124,26 @@ export function AnalyzeWorkspace() {
 
   return (
     <section>
-      <div className="surface-card flex flex-col gap-6">
-        <div className="mj-chip-group self-start">
-          <button
-            type="button"
-            onClick={() => setSource("mjml")}
-            disabled={!mjmlHtml}
-            className={source === "mjml" ? "mj-chip mj-chip--active" : "mj-chip"}
-          >
-            MJML Preview
-          </button>
-          <button
-            type="button"
-            onClick={() => setSource("html")}
-            disabled={!htmlPreviewSource}
-            className={source === "html" ? "mj-chip mj-chip--active" : "mj-chip"}
-          >
-            HTML Preview
-          </button>
-        </div>
+      <SurfaceCard className="flex flex-col gap-6">
+        <SegmentedControl
+          items={[
+            { value: "mjml", label: "MJML Preview", disabled: !mjmlHtml },
+            { value: "html", label: "HTML Preview", disabled: !htmlPreviewSource },
+          ]}
+          value={source}
+          onChange={setSource}
+          groupClassName="self-start"
+        />
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="text-[14px] text-[var(--text-secondary)]">{timestamp ? `Last analyzed: ${timestamp}` : ""}</div>
-          <button
-            type="button"
+          <Button
+            variant="primary"
             onClick={() => void runAnalysis()}
             disabled={isLoading || !html}
-            className="button button--primary disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? "Running Analysis..." : "Re-run Analysis"}
-          </button>
+          </Button>
         </div>
 
         {requestError ? (
@@ -217,7 +210,7 @@ export function AnalyzeWorkspace() {
                 />
               ))}
         </div>
-      </div>
+      </SurfaceCard>
     </section>
   );
 }

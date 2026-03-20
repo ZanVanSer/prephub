@@ -3,6 +3,11 @@
 import { ChangeEvent, DragEvent, useEffect, useMemo, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { ChoiceButtons } from '@/components/ui/choice-buttons';
+import { EmptyState } from '@/components/ui/empty-state';
+import { SegmentedControl } from '@/components/ui/segmented-control';
+import { SurfaceCard } from '@/components/ui/surface-card';
 import { getSupabaseBrowserClient } from '@/lib/auth/supabase-browser';
 import { formatBytes, getPresetDescription, getPresetLabel } from '@/modules/image-prep/lib/presets';
 import {
@@ -209,6 +214,19 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
         return uploadItems;
     }
   }, [queueFilter, uploadItems]);
+  const presetItems = useMemo(
+    () => PRESETS.map((preset) => ({ value: preset, label: getPresetLabel(preset) })),
+    []
+  );
+  const queueItems = useMemo(
+    () => [
+      { value: 'queue' as const, label: 'Queue', count: uploadItems.length },
+      { value: 'ready' as const, label: 'Ready', count: readyCount },
+      { value: 'completed' as const, label: 'Completed', count: doneCount },
+      { value: 'review' as const, label: 'Review', count: skippedCount }
+    ],
+    [doneCount, readyCount, skippedCount, uploadItems.length]
+  );
 
   useEffect(() => {
     const {
@@ -417,7 +435,7 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
     <section className="imprep-shell">
       <section className="workspace-layout workspace-layout--image-prep">
         <div className="workspace-main">
-          <section className="section-card imprep-stage-card">
+          <SurfaceCard className="imprep-stage-card">
             <label
               className={`dropzone imprep-dropzone-surface ${isDragging ? 'dragging' : ''}`}
               onDragOver={(event) => {
@@ -438,36 +456,7 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
 
             {uploadItems.length > 0 ? (
               <div className="imprep-queue-block">
-                <div className="mj-chip-group">
-                  <button
-                    type="button"
-                    onClick={() => setQueueFilter('queue')}
-                    className={queueFilter === 'queue' ? 'mj-chip mj-chip--active' : 'mj-chip'}
-                  >
-                    Queue {uploadItems.length}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQueueFilter('ready')}
-                    className={queueFilter === 'ready' ? 'mj-chip mj-chip--active' : 'mj-chip'}
-                  >
-                    Ready {readyCount}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQueueFilter('completed')}
-                    className={queueFilter === 'completed' ? 'mj-chip mj-chip--active' : 'mj-chip'}
-                  >
-                    Completed {doneCount}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQueueFilter('review')}
-                    className={queueFilter === 'review' ? 'mj-chip mj-chip--active' : 'mj-chip'}
-                  >
-                    Review {skippedCount}
-                  </button>
-                </div>
+                <SegmentedControl items={queueItems} value={queueFilter} onChange={setQueueFilter} />
                 <ul className="file-list">
                   {filteredUploadItems.map((item) => (
                     <li key={item.key}>
@@ -489,17 +478,13 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                 ) : null}
               </div>
             ) : (
-              <div className="imprep-empty-block">
-                <p className="empty-state">No files yet</p>
-              </div>
+              <EmptyState title="No files yet" />
             )}
-          </section>
+          </SurfaceCard>
 
-          <section className="section-card imprep-results-card">
+          <SurfaceCard className="imprep-results-card">
             {results.length === 0 ? (
-              <div className="imprep-empty-block imprep-empty-block--results">
-                <p className="empty-state">No outputs yet</p>
-              </div>
+              <EmptyState className="imprep-empty-block--results" title="No outputs yet" />
             ) : (
               <div className="results-grid">
                 {results.map((result) => (
@@ -507,27 +492,17 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                 ))}
               </div>
             )}
-          </section>
+          </SurfaceCard>
         </div>
 
         <aside className="workspace-sidebar">
-          <section className="section-card imprep-settings-card">
-            <div className="imprep-preset-grid">
-              {PRESETS.map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  className={
-                    settings.preset === preset
-                      ? 'imprep-preset-button imprep-preset-button--active'
-                      : 'imprep-preset-button'
-                  }
-                  onClick={() => setSettings((current) => ({ ...current, preset }))}
-                >
-                  {getPresetLabel(preset)}
-                </button>
-              ))}
-            </div>
+          <SurfaceCard className="imprep-settings-card">
+            <ChoiceButtons
+              className="imprep-preset-grid"
+              items={presetItems}
+              value={settings.preset}
+              onChange={(preset) => setSettings((current) => ({ ...current, preset }))}
+            />
 
             <div className="imprep-preset-detail">
               {getPresetDescription(settings.preset)}
@@ -635,17 +610,14 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
             </div>
 
             <div className="action-row imprep-action-row">
-              <button
-                type="button"
-                className="button button--primary"
+              <Button
+                variant="primary"
                 onClick={handlePrepare}
                 disabled={uploadItems.length === 0 || isProcessing}
               >
                 {isProcessing ? 'Preparing…' : 'Prepare batch'}
-              </button>
-              <button
-                type="button"
-                className="button button--secondary"
+              </Button>
+              <Button
                 onClick={() => {
                   setUploadItems([]);
                   setResults([]);
@@ -654,18 +626,18 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                 }}
               >
                 Clear batch
-              </button>
+              </Button>
             </div>
-          </section>
+          </SurfaceCard>
 
           {errors.length > 0 ? (
-            <section className="section-card imprep-notices-card">
+            <SurfaceCard className="imprep-notices-card">
               <ul className="warning-list">
                 {errors.map((error) => (
                   <li key={error}>{error}</li>
                 ))}
               </ul>
-            </section>
+            </SurfaceCard>
           ) : null}
         </aside>
       </section>

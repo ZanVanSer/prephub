@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 type OutputActionsProps = {
   htmlSizeKb: string;
   copied: boolean;
@@ -18,30 +20,17 @@ export function OutputActions({
   return (
     <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={onCopy}
-          className="button button--primary"
-        >
+        <Button variant="primary" onClick={onCopy}>
           {copied ? "Copied!" : "Copy HTML"}
-        </button>
+        </Button>
 
-        <button
-          type="button"
-          onClick={onDownload}
-          className="button button--secondary"
-        >
+        <Button onClick={onDownload}>
           Download HTML
-        </button>
+        </Button>
 
-        <button
-          type="button"
-          onClick={onMinify}
-          disabled={isMinifying}
-          className="button button--secondary disabled:cursor-not-allowed disabled:opacity-60"
-        >
+        <Button onClick={onMinify} disabled={isMinifying}>
           {isMinifying ? "Minifying..." : "Minify HTML"}
-        </button>
+        </Button>
       </div>
 
       <div className="mj-size-pill">

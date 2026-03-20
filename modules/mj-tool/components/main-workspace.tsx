@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { EditorPanel } from "@/modules/mj-tool/components/editor-panel";
 import { PreviewPanel } from "@/modules/mj-tool/components/preview-panel";
 import { useToast } from "@/modules/mj-tool/components/toast-provider";
@@ -116,22 +117,16 @@ export function MainWorkspace() {
   return (
     <section className="mj-workspace">
       <div className="mb-5 flex lg:hidden">
-        <div className="mj-mobile-toggle">
-          <button
-            type="button"
-            onClick={() => setMobilePane("editor")}
-            className={mobilePane === "editor" ? "mj-mobile-toggle__button mj-mobile-toggle__button--active" : "mj-mobile-toggle__button"}
-          >
-            Editor
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobilePane("preview")}
-            className={mobilePane === "preview" ? "mj-mobile-toggle__button mj-mobile-toggle__button--active" : "mj-mobile-toggle__button"}
-          >
-            Preview
-          </button>
-        </div>
+        <SegmentedControl
+          items={[
+            { value: "editor", label: "Editor" },
+            { value: "preview", label: "Preview" },
+          ]}
+          value={mobilePane}
+          onChange={setMobilePane}
+          groupClassName="mj-mobile-toggle"
+          className="mj-mobile-toggle__button"
+        />
       </div>
       <div className="mj-split-grid">
         <div className={mobilePane === "preview" ? "hidden lg:block" : ""}>

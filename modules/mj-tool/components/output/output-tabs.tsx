@@ -1,3 +1,5 @@
+import { SegmentedControl } from "@/components/ui/segmented-control";
+
 type OutputTab = "generated" | "minified";
 
 type OutputTabsProps = {
@@ -12,27 +14,17 @@ export function OutputTabs({
   minifiedReady,
 }: OutputTabsProps) {
   return (
-    <div className="mj-chip-group">
-      <button
-        type="button"
-        onClick={() => onTabChange("generated")}
-        className={activeTab === "generated" ? "mj-chip mj-chip--active" : "mj-chip"}
-      >
-        Generated HTML
-      </button>
-
-      <button
-        type="button"
-        onClick={() => onTabChange("minified")}
-        className={activeTab === "minified" ? "mj-chip mj-chip--active" : "mj-chip"}
-      >
-        Minified HTML
-        {!minifiedReady ? (
-          <span className="ml-2 rounded-full bg-[var(--surface)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)]">
-            create first
-          </span>
-        ) : null}
-      </button>
-    </div>
+    <SegmentedControl
+      items={[
+        { value: "generated", label: "Generated HTML" },
+        {
+          value: "minified",
+          label: "Minified HTML",
+          count: minifiedReady ? undefined : "new",
+        },
+      ]}
+      value={activeTab}
+      onChange={onTabChange}
+    />
   );
 }

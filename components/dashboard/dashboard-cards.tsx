@@ -1,11 +1,13 @@
 import { TOOL_MODULES } from "@/lib/design/modules";
+import { SectionStack } from "@/components/ui/section-stack";
 import { ModuleCard } from "@/components/ui/module-card";
+import { SurfaceCard } from "@/components/ui/surface-card";
 
 export function DashboardCards() {
   const modules = TOOL_MODULES.filter((module) => module.href !== "/dashboard");
 
   return (
-    <section className="space-y-8">
+    <SectionStack gap="xl">
       <div className="page-hero">
         <div>
           <p className="page-hero__eyebrow">ToolHub Workspace</p>
@@ -17,7 +19,7 @@ export function DashboardCards() {
       </div>
 
       {modules.length === 0 ? (
-        <section className="surface-card p-8 text-[var(--text-secondary)]">No tools available</section>
+        <SurfaceCard className="p-8 text-[var(--text-secondary)]">No tools available</SurfaceCard>
       ) : (
         <div className="grid gap-6 xl:grid-cols-2">
           {modules.map((module) => (
@@ -25,6 +27,6 @@ export function DashboardCards() {
           ))}
         </div>
       )}
-    </section>
+    </SectionStack>
   );
 }

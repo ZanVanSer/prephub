@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { BellIcon, SettingsIcon } from "@/components/ui/icons";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabase-browser";
 
@@ -32,9 +33,9 @@ export function AppHeader({ userEmail }: { userEmail: string }) {
           <span className="user-pill__avatar">{userEmail.slice(0, 1).toUpperCase()}</span>
           <span className="user-pill__email">{userEmail}</span>
         </div>
-        <button type="button" className="button button--secondary" onClick={handleLogout}>
+        <Button onClick={handleLogout}>
           Logout
-        </button>
+        </Button>
       </div>
     </header>
   );
