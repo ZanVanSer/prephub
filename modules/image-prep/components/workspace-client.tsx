@@ -34,22 +34,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   customDisplayWidth: 600
 };
 
-function MetricCard({
-  label,
-  value,
-  tone = 'default'
-}: {
-  label: string;
-  value: string;
-  tone?: 'default' | 'accent' | 'success';
-}) {
-  return (
-    <article className={`imprep-metric-card imprep-metric-card--${tone}`}>
-      <p className="imprep-metric-card__label">{label}</p>
-      <strong className="imprep-metric-card__value">{value}</strong>
-    </article>
-  );
-}
+type QueueFilter = 'queue' | 'ready' | 'completed' | 'review';
 
 function StatusPill({ status }: { status: ProcessedImageResult['status'] }) {
   return <span className={`status-pill status-${status}`}>{status.replace('-', ' ')}</span>;
@@ -176,6 +161,7 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
   const [errors, setErrors] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [queueFilter, setQueueFilter] = useState<QueueFilter>('queue');
 
   const validFiles = useMemo(
     () =>
@@ -192,6 +178,10 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
     () => uploadItems.filter((item) => item.status === 'done').length,
     [uploadItems]
   );
+  const readyCount = useMemo(
+    () => uploadItems.filter((item) => item.status === 'ready').length,
+    [uploadItems]
+  );
   const skippedCount = useMemo(
     () =>
       uploadItems.filter(
@@ -202,6 +192,23 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
       ).length,
     [uploadItems]
   );
+  const filteredUploadItems = useMemo(() => {
+    switch (queueFilter) {
+      case 'ready':
+        return uploadItems.filter((item) => item.status === 'ready');
+      case 'completed':
+        return uploadItems.filter((item) => item.status === 'done');
+      case 'review':
+        return uploadItems.filter(
+          (item) =>
+            item.status === 'skipped-too-large' ||
+            item.status === 'skipped-unsupported' ||
+            item.status === 'failed'
+        );
+      default:
+        return uploadItems;
+    }
+  }, [queueFilter, uploadItems]);
 
   useEffect(() => {
     const {
@@ -408,13 +415,6 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
 
   return (
     <section className="imprep-shell">
-      <section className="imprep-metrics">
-        <MetricCard label="Queue" value={`${uploadItems.length} files`} tone="accent" />
-        <MetricCard label="Ready size" value={formatBytes(submittableSize)} />
-        <MetricCard label="Completed" value={String(doneCount)} tone="success" />
-        <MetricCard label="Needs review" value={String(skippedCount)} />
-      </section>
-
       <section className="workspace-layout workspace-layout--image-prep">
         <div className="workspace-main">
           <section className="section-card imprep-stage-card">
@@ -438,8 +438,38 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
 
             {uploadItems.length > 0 ? (
               <div className="imprep-queue-block">
+                <div className="mj-chip-group">
+                  <button
+                    type="button"
+                    onClick={() => setQueueFilter('queue')}
+                    className={queueFilter === 'queue' ? 'mj-chip mj-chip--active' : 'mj-chip'}
+                  >
+                    Queue {uploadItems.length}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQueueFilter('ready')}
+                    className={queueFilter === 'ready' ? 'mj-chip mj-chip--active' : 'mj-chip'}
+                  >
+                    Ready {readyCount}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQueueFilter('completed')}
+                    className={queueFilter === 'completed' ? 'mj-chip mj-chip--active' : 'mj-chip'}
+                  >
+                    Completed {doneCount}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQueueFilter('review')}
+                    className={queueFilter === 'review' ? 'mj-chip mj-chip--active' : 'mj-chip'}
+                  >
+                    Review {skippedCount}
+                  </button>
+                </div>
                 <ul className="file-list">
-                  {uploadItems.map((item) => (
+                  {filteredUploadItems.map((item) => (
                     <li key={item.key}>
                       <div className="file-meta">
                         <strong>{item.file.name}</strong>
@@ -454,24 +484,21 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                     </li>
                   ))}
                 </ul>
+                {filteredUploadItems.length === 0 ? (
+                  <div className="imprep-empty-inline">Nothing here</div>
+                ) : null}
               </div>
             ) : (
               <div className="imprep-empty-block">
-                <p className="empty-state">No files in the queue yet. Start by dropping in a batch above.</p>
+                <p className="empty-state">No files yet</p>
               </div>
             )}
           </section>
 
           <section className="section-card imprep-results-card">
-            <div className="section-head">
-              <div>
-                <h2>Processed outputs</h2>
-              </div>
-            </div>
-
             {results.length === 0 ? (
               <div className="imprep-empty-block imprep-empty-block--results">
-                <p className="empty-state">Run a batch to reveal optimized previews, savings, and export recommendations.</p>
+                <p className="empty-state">No outputs yet</p>
               </div>
             ) : (
               <div className="results-grid">
@@ -485,24 +512,25 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
 
         <aside className="workspace-sidebar">
           <section className="section-card imprep-settings-card">
-            <div className="section-head">
-              <div>
-                <h2>Presets</h2>
-              </div>
-            </div>
-
-            <div className="preset-grid">
+            <div className="imprep-preset-grid">
               {PRESETS.map((preset) => (
                 <button
                   key={preset}
                   type="button"
-                  className={`preset-card ${settings.preset === preset ? 'active' : ''}`}
+                  className={
+                    settings.preset === preset
+                      ? 'imprep-preset-button imprep-preset-button--active'
+                      : 'imprep-preset-button'
+                  }
                   onClick={() => setSettings((current) => ({ ...current, preset }))}
                 >
-                  <strong>{getPresetLabel(preset)}</strong>
-                  <span>{getPresetDescription(preset)}</span>
+                  {getPresetLabel(preset)}
                 </button>
               ))}
+            </div>
+
+            <div className="imprep-preset-detail">
+              {getPresetDescription(settings.preset)}
             </div>
 
             <div className="imprep-settings-group">
@@ -523,9 +551,6 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                     <option value="png">PNG</option>
                     <option value="webp">WebP</option>
                   </select>
-                  {settings.outputFormat === 'webp' ? (
-                    <small>WebP support still varies across email clients.</small>
-                  ) : null}
                 </label>
 
                 <label className="field">
@@ -635,12 +660,6 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
 
           {errors.length > 0 ? (
             <section className="section-card imprep-notices-card">
-              <div className="section-head">
-                <div>
-                  <h2>Notices</h2>
-                  <p>Review issues that need attention before rerunning the batch.</p>
-                </div>
-              </div>
               <ul className="warning-list">
                 {errors.map((error) => (
                   <li key={error}>{error}</li>
