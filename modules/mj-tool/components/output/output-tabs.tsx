@@ -12,39 +12,25 @@ export function OutputTabs({
   minifiedReady,
 }: OutputTabsProps) {
   return (
-    <div className="flex flex-wrap items-center gap-6 border-b border-slate-200 pb-3.5">
+    <div className="mj-chip-group">
       <button
         type="button"
         onClick={() => onTabChange("generated")}
-        className={`relative pb-2 text-[15px] font-medium transition-colors ${
-          activeTab === "generated"
-            ? "text-slate-950"
-            : "text-slate-500 hover:text-slate-800"
-        }`}
+        className={activeTab === "generated" ? "mj-chip mj-chip--active" : "mj-chip"}
       >
         Generated HTML
-        {activeTab === "generated" ? (
-          <span className="absolute inset-x-0 -bottom-[13px] h-0.5 bg-[var(--color-brand)]" />
-        ) : null}
       </button>
 
       <button
         type="button"
         onClick={() => onTabChange("minified")}
-        className={`relative pb-2 text-[15px] font-medium transition-colors ${
-          activeTab === "minified"
-            ? "text-slate-950"
-            : "text-slate-500 hover:text-slate-800"
-        }`}
+        className={activeTab === "minified" ? "mj-chip mj-chip--active" : "mj-chip"}
       >
         Minified HTML
         {!minifiedReady ? (
-          <span className="ml-2 border border-[var(--color-border)] bg-slate-50 px-2 py-0.5 text-[11px] text-slate-500">
+          <span className="ml-2 rounded-full bg-[var(--surface)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)]">
             create first
           </span>
-        ) : null}
-        {activeTab === "minified" ? (
-          <span className="absolute inset-x-0 -bottom-[13px] h-0.5 bg-[var(--color-brand)]" />
         ) : null}
       </button>
     </div>

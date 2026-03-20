@@ -21,7 +21,7 @@ export function OutputActions({
         <button
           type="button"
           onClick={onCopy}
-          className="inline-flex items-center rounded-[6px] border border-slate-900 bg-slate-900 px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-slate-800"
+          className="button button--primary"
         >
           {copied ? "Copied!" : "Copy HTML"}
         </button>
@@ -29,7 +29,7 @@ export function OutputActions({
         <button
           type="button"
           onClick={onDownload}
-          className="inline-flex items-center rounded-[6px] border border-[var(--color-border)] bg-white px-4 py-2.5 text-[14px] font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-950"
+          className="button button--secondary"
         >
           Download HTML
         </button>
@@ -38,14 +38,14 @@ export function OutputActions({
           type="button"
           onClick={onMinify}
           disabled={isMinifying}
-          className="inline-flex items-center rounded-[6px] border border-[var(--color-border)] bg-slate-50 px-4 py-2.5 text-[14px] font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+          className="button button--secondary disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isMinifying ? "Minifying..." : "Minify HTML"}
         </button>
       </div>
 
-      <div className="inline-flex items-center rounded-[6px] border border-[var(--color-border)] bg-slate-50 px-4 py-2.5 text-[14px] text-slate-600">
-        HTML Size: {htmlSizeKb}
+      <div className="mj-size-pill">
+        {htmlSizeKb}
       </div>
     </div>
   );

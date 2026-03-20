@@ -48,15 +48,6 @@ export function SettingsWorkspace() {
 
   return (
     <section className="space-y-6">
-      <div className="max-w-2xl">
-        <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-slate-950">
-          Settings
-        </h1>
-        <p className="mt-2 text-[15px] leading-6 text-slate-500">
-          Preview defaults and analyzer options for this workspace.
-        </p>
-      </div>
-
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
         <div className="space-y-6">
           <SettingsPanel title="Preview">
@@ -74,7 +65,7 @@ export function SettingsWorkspace() {
                     Number(event.target.value) || DEFAULT_SETTINGS.previewWidth,
                   )
                 }
-                className="w-full border border-[var(--color-border)] bg-white px-4 py-3 text-[14px] text-slate-900 outline-none transition-colors focus:border-[var(--color-brand)]"
+                className="w-full rounded-[18px] bg-[var(--surface-low)] px-4 py-3 text-[14px] text-[var(--text-primary)] outline-none"
               />
             </SettingsRow>
 
@@ -90,7 +81,7 @@ export function SettingsWorkspace() {
                     event.target.value as AnalyzerSettings["previewDevice"],
                   )
                 }
-                className="w-full border border-[var(--color-border)] bg-white px-4 py-3 text-[14px] text-slate-900 outline-none transition-colors focus:border-[var(--color-brand)]"
+                className="w-full rounded-[18px] bg-[var(--surface-low)] px-4 py-3 text-[14px] text-[var(--text-primary)] outline-none"
               >
                 <option value="desktop">Desktop</option>
                 <option value="mobile">Mobile</option>
@@ -109,7 +100,7 @@ export function SettingsWorkspace() {
                     event.target.value as AnalyzerSettings["previewTheme"],
                   )
                 }
-                className="w-full border border-[var(--color-border)] bg-white px-4 py-3 text-[14px] text-slate-900 outline-none transition-colors focus:border-[var(--color-brand)]"
+                className="w-full rounded-[18px] bg-[var(--surface-low)] px-4 py-3 text-[14px] text-[var(--text-primary)] outline-none"
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -176,7 +167,7 @@ export function SettingsWorkspace() {
                       event.target.value as AnalyzerSettings["spamSensitivity"],
                     )
                   }
-                  className="w-full border border-[var(--color-border)] bg-white px-4 py-3 text-[14px] text-slate-900 outline-none transition-colors focus:border-[var(--color-brand)]"
+                  className="w-full rounded-[18px] bg-[var(--surface-low)] px-4 py-3 text-[14px] text-[var(--text-primary)] outline-none"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -192,11 +183,11 @@ export function SettingsWorkspace() {
               <button
                 type="button"
                 onClick={() => updateSetting("linkCheckEnabled", !settings.linkCheckEnabled)}
-                className="inline-flex items-center gap-3 border border-[var(--color-border)] bg-white px-4 py-3 text-[14px] text-slate-700 transition-colors hover:bg-slate-50"
+                className="inline-flex items-center gap-3 rounded-[18px] bg-[var(--surface-low)] px-4 py-3 text-[14px] text-[var(--text-primary)]"
               >
                 <span
                   className={`h-2.5 w-2.5 ${
-                    settings.linkCheckEnabled ? "bg-[var(--color-brand)]" : "bg-slate-300"
+                    settings.linkCheckEnabled ? "bg-[var(--primary)]" : "bg-slate-300"
                   }`}
                 />
                 {settings.linkCheckEnabled ? "Enabled" : "Disabled"}
@@ -205,18 +196,11 @@ export function SettingsWorkspace() {
           </SettingsPanel>
         </div>
 
-        <aside className="h-fit border border-[var(--color-border)] bg-white">
-          <div className="border-b border-slate-200 px-5 py-4">
-            <h2 className="text-[18px] font-semibold text-slate-950">Actions</h2>
-          </div>
-
-          <div className="space-y-4 px-5 py-5">
-            <p className="text-[14px] leading-6 text-slate-500">
-              Changes stay local to this browser and affect preview and analysis defaults.
-            </p>
+        <aside className="mj-settings-aside">
+          <div className="space-y-4">
 
             {saved ? (
-              <div className="border border-emerald-200 bg-emerald-50 px-4 py-3 text-[14px] text-emerald-700">
+              <div className="rounded-[20px] bg-[rgba(95,139,112,0.12)] px-4 py-3 text-[14px] text-[var(--success)]">
                 Settings saved.
               </div>
             ) : null}
@@ -224,9 +208,9 @@ export function SettingsWorkspace() {
             <button
               type="button"
               onClick={handleSave}
-              className="inline-flex w-full items-center justify-center border border-slate-900 bg-slate-900 px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-slate-800"
+              className="button button--primary w-full"
             >
-              Save Settings
+              Save
             </button>
           </div>
         </aside>
@@ -242,9 +226,9 @@ type SettingsPanelProps = {
 
 function SettingsPanel({ title, children }: SettingsPanelProps) {
   return (
-    <section className="border border-[var(--color-border)] bg-white">
-      <div className="border-b border-slate-200 px-5 py-4">
-        <h2 className="text-[18px] font-semibold text-slate-950">{title}</h2>
+    <section className="mj-settings-panel">
+      <div className="px-5 py-4">
+        <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">{title}</h2>
       </div>
       <div>{children}</div>
     </section>
@@ -259,10 +243,10 @@ type SettingsRowProps = {
 
 function SettingsRow({ label, description, children }: SettingsRowProps) {
   return (
-    <div className="grid gap-4 border-t border-slate-200 px-5 py-5 first:border-t-0 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)] lg:items-start lg:gap-6">
+    <div className="mj-settings-row">
       <div className="space-y-1">
-        <p className="text-[14px] font-medium text-slate-900">{label}</p>
-        <p className="text-[13px] leading-5 text-slate-500">{description}</p>
+        <p className="text-[14px] font-medium text-[var(--text-primary)]">{label}</p>
+        <p className="text-[13px] leading-5 text-[var(--text-secondary)]">{description}</p>
       </div>
       <div>{children}</div>
     </div>
@@ -276,9 +260,9 @@ type InputWithSuffixProps = {
 
 function InputWithSuffix({ children, suffix }: InputWithSuffixProps) {
   return (
-    <div className="flex items-center border border-[var(--color-border)] bg-white">
+    <div className="mj-input-with-suffix">
       <div className="min-w-0 flex-1">{children}</div>
-      <span className="border-l border-slate-200 px-3 text-[13px] text-slate-500">
+      <span className="px-3 text-[13px] text-[var(--text-secondary)]">
         {suffix}
       </span>
     </div>

@@ -11,9 +11,9 @@ type AnalysisCategoryCardProps = {
 };
 
 const STATUS_STYLES = {
-  pass: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  warning: "border-amber-200 bg-amber-50 text-amber-700",
-  error: "border-rose-200 bg-rose-50 text-rose-700",
+  pass: "bg-[rgba(95,139,112,0.12)] text-[var(--success)]",
+  warning: "bg-[rgba(182,131,59,0.12)] text-[var(--warning)]",
+  error: "bg-[rgba(187,91,101,0.12)] text-[var(--danger)]",
 } as const;
 
 export function AnalysisCategoryCard({
@@ -32,19 +32,19 @@ export function AnalysisCategoryCard({
   }
 
   return (
-    <div className="overflow-hidden border border-[var(--color-border)] bg-white">
+    <div className="mj-analysis-card">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-4 px-5 py-4.5 text-left transition-colors hover:bg-slate-50"
+        className="flex w-full items-center justify-between gap-4 px-5 py-4.5 text-left"
       >
         <div className="min-w-0">
-          <h3 className="text-[17px] font-semibold text-slate-950">{category.name}</h3>
-          <p className="mt-1 text-[14px] leading-6 text-slate-500">{category.summary}</p>
+          <h3 className="text-[17px] font-semibold text-[var(--text-primary)]">{category.name}</h3>
+          <p className="mt-1 text-[14px] leading-6 text-[var(--text-secondary)]">{category.summary}</p>
         </div>
         <div className="flex items-center gap-3">
           <span
-            className={`inline-flex rounded-[6px] border px-2.5 py-1 text-xs font-medium ${
+            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
               STATUS_STYLES[category.status]
             }`}
           >
@@ -54,18 +54,15 @@ export function AnalysisCategoryCard({
                 ? "Action Required"
                 : "Critical"}
           </span>
-          <span className="text-slate-400">{expanded ? "⌃" : "⌄"}</span>
+          <span className="text-[var(--text-secondary)]">{expanded ? "⌃" : "⌄"}</span>
         </div>
       </button>
 
       {expanded ? (
-        <div className="border-t border-slate-100 px-5 py-4">
+        <div className="px-5 py-4">
           <div className="space-y-4">
             {category.checks.map((check) => (
-              <div
-                key={check.id}
-                className="rounded-[6px] border border-slate-200 bg-slate-50 px-4 py-3.5"
-              >
+              <div key={check.id} className="rounded-[24px] bg-[var(--surface-low)] px-4 py-3.5">
                 <div className="flex items-start gap-3">
                   <span
                     className={`mt-2 h-2 w-2 ${
@@ -78,10 +75,10 @@ export function AnalysisCategoryCard({
                   />
                   <div className="min-w-0 space-y-2">
                     <div>
-                      <p className="text-[14px] font-semibold text-slate-900">
+                      <p className="text-[14px] font-semibold text-[var(--text-primary)]">
                         {check.name}
                       </p>
-                      <p className="text-[14px] leading-6 text-slate-600">
+                      <p className="text-[14px] leading-6 text-[var(--text-secondary)]">
                         {check.message}
                       </p>
                     </div>
@@ -90,7 +87,7 @@ export function AnalysisCategoryCard({
                         {check.flagged.map((item) => (
                           <span
                             key={item}
-                            className="rounded-[6px] border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs text-amber-700"
+                            className="rounded-full bg-[rgba(182,131,59,0.12)] px-2.5 py-1 text-xs text-[var(--warning)]"
                           >
                             {item}
                           </span>
@@ -102,7 +99,7 @@ export function AnalysisCategoryCard({
                         <button
                           type="button"
                           onClick={() => toggleCheck(check.id)}
-                          className="text-sm font-medium text-[var(--color-brand)] transition-colors hover:text-[var(--color-brand-strong)]"
+                          className="text-sm text-[var(--primary)] transition-colors"
                         >
                           {expandedChecks.includes(check.id)
                             ? `Hide ${check.findings.length} issue details`
@@ -112,15 +109,12 @@ export function AnalysisCategoryCard({
                         {expandedChecks.includes(check.id) ? (
                           <div className="space-y-3">
                             {check.findings.map((finding) => (
-                              <div
-                                key={finding.id}
-                                className="rounded-[6px] border border-slate-200 bg-white px-4 py-3"
-                              >
-                                <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                              <div key={finding.id} className="rounded-[20px] bg-white px-4 py-3">
+                                <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-[var(--text-secondary)]">
                                   <span>{finding.label ?? "Finding"}</span>
                                   {finding.line ? <span>Line {finding.line}</span> : null}
                                 </div>
-                                <pre className="overflow-x-auto rounded-[4px] border border-slate-800 bg-slate-950 px-3 py-3 font-mono text-xs leading-6 text-slate-200">
+                                <pre className="mj-code-snippet">
                                   <code>{finding.snippet}</code>
                                 </pre>
                               </div>

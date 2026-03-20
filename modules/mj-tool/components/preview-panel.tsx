@@ -28,53 +28,37 @@ export function PreviewPanel({
   const previewHtml = hasHtml ? applyPreviewTheme(html, previewTheme) : "";
 
   return (
-    <div className="overflow-hidden border border-[var(--color-border)] bg-white xl:h-[calc(100vh-11rem)] xl:min-h-[760px]">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--color-border)] px-5 py-3.5">
-        <div className="inline-flex overflow-hidden border border-[var(--color-border)] text-sm text-slate-600">
+    <div className="mj-preview-panel xl:min-h-[760px]">
+      <div className="mj-panel-header mj-panel-header--wrap">
+        <div className="mj-chip-group">
           <button
             type="button"
             onClick={() => onDeviceModeChange("desktop")}
-            className={`px-4 py-2.5 transition-colors ${
-              deviceMode === "desktop"
-                ? "bg-slate-900 text-white"
-                : "hover:bg-slate-50 hover:text-slate-900"
-            }`}
+            className={deviceMode === "desktop" ? "mj-chip mj-chip--active" : "mj-chip"}
           >
             Desktop
           </button>
           <button
             type="button"
             onClick={() => onDeviceModeChange("mobile")}
-            className={`border-l border-[var(--color-border)] px-4 py-2.5 transition-colors ${
-              deviceMode === "mobile"
-                ? "bg-slate-900 text-white"
-                : "hover:bg-slate-50 hover:text-slate-900"
-            }`}
+            className={deviceMode === "mobile" ? "mj-chip mj-chip--active" : "mj-chip"}
           >
             Mobile
           </button>
         </div>
 
-        <div className="flex items-center gap-2 text-slate-500">
+        <div className="mj-chip-group">
           <button
             type="button"
             onClick={() => onPreviewThemeChange("light")}
-            className={`border px-3.5 py-2.5 text-[14px] transition-colors ${
-              previewTheme === "light"
-                ? "border-slate-900 bg-slate-900 text-white"
-                : "border-[var(--color-border)] hover:bg-slate-50 hover:text-slate-900"
-            }`}
+            className={previewTheme === "light" ? "mj-chip mj-chip--active" : "mj-chip"}
           >
             Light
           </button>
           <button
             type="button"
             onClick={() => onPreviewThemeChange("dark")}
-            className={`border px-3.5 py-2.5 text-[14px] transition-colors ${
-              previewTheme === "dark"
-                ? "border-slate-900 bg-slate-900 text-white"
-                : "border-[var(--color-border)] hover:bg-slate-50 hover:text-slate-900"
-            }`}
+            className={previewTheme === "dark" ? "mj-chip mj-chip--active" : "mj-chip"}
           >
             Dark
           </button>
@@ -82,7 +66,7 @@ export function PreviewPanel({
             type="button"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="border border-[var(--color-border)] px-3.5 py-2.5 text-[14px] transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mj-chip mj-chip--primary mj-chip--refresh disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
@@ -90,20 +74,14 @@ export function PreviewPanel({
       </div>
 
       {requestError ? (
-        <div className="mx-5 mt-5 rounded-[6px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+        <div className="mx-5 mt-5 rounded-[20px] bg-[rgba(187,91,101,0.12)] px-4 py-3 text-sm text-[var(--danger)]">
           {requestError}
         </div>
       ) : null}
 
-      <div
-        className={`m-5 rounded-[6px] border border-[var(--color-border)] p-5 xl:flex xl:h-[calc(100%-7rem)] xl:min-h-0 xl:flex-col ${
-          previewTheme === "light"
-            ? "bg-slate-100"
-            : "bg-slate-900"
-        }`}
-      >
+      <div className={previewTheme === "light" ? "mj-preview-stage mj-preview-stage--light" : "mj-preview-stage mj-preview-stage--dark"}>
         <div
-          className="mx-auto w-full overflow-hidden rounded-[6px] border border-[var(--color-border)] bg-white transition-[width] duration-200 xl:flex xl:min-h-0 xl:flex-1 xl:flex-col"
+          className="mj-preview-frame"
           style={{ width: frameWidth, maxWidth: "100%" }}
         >
           {hasHtml ? (
@@ -115,15 +93,11 @@ export function PreviewPanel({
               }`}
             />
           ) : (
-            <div className="flex min-h-[620px] items-center justify-center px-8 text-center xl:min-h-0 xl:flex-1">
-              <div className="max-w-md space-y-3">
-                <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-slate-900">
-                  Refresh to compile your MJML.
+            <div className="mj-preview-empty">
+              <div className="max-w-md">
+                <h2 className="text-[24px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
+                  Refresh to compile
                 </h2>
-                <p className="text-[15px] leading-7 text-slate-500">
-                  The preview updates only when you ask for it, so you can edit
-                  freely without constant API requests.
-                </p>
               </div>
             </div>
           )}
