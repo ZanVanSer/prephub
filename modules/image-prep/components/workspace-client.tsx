@@ -34,6 +34,23 @@ const DEFAULT_SETTINGS: AppSettings = {
   customDisplayWidth: 600
 };
 
+function MetricCard({
+  label,
+  value,
+  tone = 'default'
+}: {
+  label: string;
+  value: string;
+  tone?: 'default' | 'accent' | 'success';
+}) {
+  return (
+    <article className={`imprep-metric-card imprep-metric-card--${tone}`}>
+      <p className="imprep-metric-card__label">{label}</p>
+      <strong className="imprep-metric-card__value">{value}</strong>
+    </article>
+  );
+}
+
 function StatusPill({ status }: { status: ProcessedImageResult['status'] }) {
   return <span className={`status-pill status-${status}`}>{status.replace('-', ' ')}</span>;
 }
@@ -171,6 +188,20 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
     () => validFiles.reduce((total, item) => total + item.file.size, 0),
     [validFiles]
   );
+  const doneCount = useMemo(
+    () => uploadItems.filter((item) => item.status === 'done').length,
+    [uploadItems]
+  );
+  const skippedCount = useMemo(
+    () =>
+      uploadItems.filter(
+        (item) =>
+          item.status === 'skipped-too-large' ||
+          item.status === 'skipped-unsupported' ||
+          item.status === 'failed'
+      ).length,
+    [uploadItems]
+  );
 
   useEffect(() => {
     const {
@@ -229,17 +260,6 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
     setIsDragging(false);
     updateFiles(event.dataTransfer.files);
   }
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    setUploadItems([]);
-    setResults([]);
-    setZipDownloadUrl('');
-    setErrors([]);
-    router.replace('/login');
-    router.refresh();
-  }
-
   async function handlePrepare() {
     if (!session) {
       setErrors(['Sign in to process images.']);
@@ -387,39 +407,19 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
   }
 
   return (
-      <section className="workspace-layout">
-        <section className="section-card imprep-toolbar">
-          <div className="brand-block">
-            <div className="brand-mark" aria-hidden="true">
-              im
-            </div>
-            <div>
-              <h2>Batch workspace</h2>
-              <p>Prepare email-safe image exports with one batch workflow.</p>
-            </div>
-          </div>
-          <div className="header-actions">
-            <div className="header-meta">
-              <span>{session?.user.email ?? 'Signed in'}</span>
-              <span>{uploadItems.length} files in queue</span>
-            </div>
-            <button className="secondary-button" type="button" onClick={handleSignOut}>
-              Sign out
-            </button>
-          </div>
-        </section>
+    <section className="imprep-shell">
+      <section className="imprep-metrics">
+        <MetricCard label="Queue" value={`${uploadItems.length} files`} tone="accent" />
+        <MetricCard label="Ready size" value={formatBytes(submittableSize)} />
+        <MetricCard label="Completed" value={String(doneCount)} tone="success" />
+        <MetricCard label="Needs review" value={String(skippedCount)} />
+      </section>
 
+      <section className="workspace-layout workspace-layout--image-prep">
         <div className="workspace-main">
-          <section className="section-card">
-            <div className="section-head">
-              <div>
-                <h2>Upload</h2>
-                <p>Use JPG, PNG, WebP, or GIF files. Files over {getFileLimitLabel()} are skipped.</p>
-              </div>
-            </div>
-
+          <section className="section-card imprep-stage-card">
             <label
-              className={`dropzone ${isDragging ? 'dragging' : ''}`}
+              className={`dropzone imprep-dropzone-surface ${isDragging ? 'dragging' : ''}`}
               onDragOver={(event) => {
                 event.preventDefault();
                 setIsDragging(true);
@@ -433,45 +433,46 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                 multiple
                 onChange={handleFileInput}
               />
-              <strong>Drop images here</strong>
-              <span>Or click to select files from your computer.</span>
+              <strong>Drop your images here</strong>
             </label>
 
             {uploadItems.length > 0 ? (
-              <ul className="file-list">
-                {uploadItems.map((item) => (
-                  <li key={item.key}>
-                    <div className="file-meta">
-                      <strong>{item.file.name}</strong>
-                      <span>{item.note}</span>
-                    </div>
-                    <div className="file-trailing">
-                      <span>{formatBytes(item.file.size)}</span>
-                      <span className={`upload-status upload-status-${item.status}`}>
-                        {getUploadStatusLabel(item.status)}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+              <div className="imprep-queue-block">
+                <ul className="file-list">
+                  {uploadItems.map((item) => (
+                    <li key={item.key}>
+                      <div className="file-meta">
+                        <strong>{item.file.name}</strong>
+                        <span>{item.note}</span>
+                      </div>
+                      <div className="file-trailing">
+                        <span>{formatBytes(item.file.size)}</span>
+                        <span className={`upload-status upload-status-${item.status}`}>
+                          {getUploadStatusLabel(item.status)}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="imprep-empty-block">
+                <p className="empty-state">No files in the queue yet. Start by dropping in a batch above.</p>
+              </div>
+            )}
           </section>
 
-          <section className="section-card">
+          <section className="section-card imprep-results-card">
             <div className="section-head">
               <div>
-                <h2>Results</h2>
-                <p>Processed files appear here with download links and export details.</p>
+                <h2>Processed outputs</h2>
               </div>
-              {zipDownloadUrl ? (
-                <a className="primary-button" href={zipDownloadUrl}>
-                  Download ZIP
-                </a>
-              ) : null}
             </div>
 
             {results.length === 0 ? (
-              <p className="empty-state">Run a batch to see previews, file savings, and recommendations.</p>
+              <div className="imprep-empty-block imprep-empty-block--results">
+                <p className="empty-state">Run a batch to reveal optimized previews, savings, and export recommendations.</p>
+              </div>
             ) : (
               <div className="results-grid">
                 {results.map((result) => (
@@ -483,11 +484,10 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
         </div>
 
         <aside className="workspace-sidebar">
-          <section className="section-card">
+          <section className="section-card imprep-settings-card">
             <div className="section-head">
               <div>
-                <h2>Settings</h2>
-                <p>These options apply to every file in the current batch.</p>
+                <h2>Presets</h2>
               </div>
             </div>
 
@@ -505,39 +505,40 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
               ))}
             </div>
 
-            <div className="field-grid">
-              <label className="field">
-                <span>Output format</span>
-                <select
-                  value={settings.outputFormat}
-                  onChange={(event) =>
-                    setSettings((current) => ({
-                      ...current,
-                      outputFormat: event.target.value as AppSettings['outputFormat']
-                    }))
-                  }
-                >
-                  <option value="auto">Auto</option>
-                  <option value="jpeg">JPEG</option>
-                  <option value="png">PNG</option>
-                  <option value="webp">WebP</option>
-                </select>
-                {settings.outputFormat === 'webp' ? (
-                  <small>WebP support still varies across email clients.</small>
-                ) : null}
-              </label>
+            <div className="imprep-settings-group">
+              <div className="field-grid">
+                <label className="field">
+                  <span>Output format</span>
+                  <select
+                    value={settings.outputFormat}
+                    onChange={(event) =>
+                      setSettings((current) => ({
+                        ...current,
+                        outputFormat: event.target.value as AppSettings['outputFormat']
+                      }))
+                    }
+                  >
+                    <option value="auto">Auto</option>
+                    <option value="jpeg">JPEG</option>
+                    <option value="png">PNG</option>
+                    <option value="webp">WebP</option>
+                  </select>
+                  {settings.outputFormat === 'webp' ? (
+                    <small>WebP support still varies across email clients.</small>
+                  ) : null}
+                </label>
 
-              <label className="field">
-                <span>Compression mode</span>
-                <select
-                  value={settings.compressionMode}
-                  onChange={(event) =>
-                    setSettings((current) => ({
-                      ...current,
-                      compressionMode: event.target.value as AppSettings['compressionMode']
-                    }))
-                  }
-                >
+                <label className="field">
+                  <span>Compression mode</span>
+                  <select
+                    value={settings.compressionMode}
+                    onChange={(event) =>
+                      setSettings((current) => ({
+                        ...current,
+                        compressionMode: event.target.value as AppSettings['compressionMode']
+                      }))
+                    }
+                  >
                   <option value="small">Smaller file</option>
                   <option value="balanced">Balanced</option>
                   <option value="sharp">Sharper image</option>
@@ -605,12 +606,13 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                   />
                 </label>
               ) : null}
+              </div>
             </div>
 
-            <div className="action-row">
+            <div className="action-row imprep-action-row">
               <button
                 type="button"
-                className="primary-button"
+                className="button button--primary"
                 onClick={handlePrepare}
                 disabled={uploadItems.length === 0 || isProcessing}
               >
@@ -618,7 +620,7 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
               </button>
               <button
                 type="button"
-                className="secondary-button"
+                className="button button--secondary"
                 onClick={() => {
                   setUploadItems([]);
                   setResults([]);
@@ -626,14 +628,19 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
                   setZipDownloadUrl('');
                 }}
               >
-                Clear
+                Clear batch
               </button>
             </div>
           </section>
 
           {errors.length > 0 ? (
-            <section className="section-card">
-              <h2>Notices</h2>
+            <section className="section-card imprep-notices-card">
+              <div className="section-head">
+                <div>
+                  <h2>Notices</h2>
+                  <p>Review issues that need attention before rerunning the batch.</p>
+                </div>
+              </div>
               <ul className="warning-list">
                 {errors.map((error) => (
                   <li key={error}>{error}</li>
@@ -643,5 +650,6 @@ export function WorkspaceClient({ initialSession }: { initialSession: Session })
           ) : null}
         </aside>
       </section>
+    </section>
   );
 }

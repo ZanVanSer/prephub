@@ -13,10 +13,7 @@ export async function ImagePrepModulePage() {
   }
 
   return (
-    <ModuleFrame
-      title="Image Prep"
-      description="Upload, process, and export cleaner email-ready image batches without leaving ToolHub."
-    >
+    <ModuleFrame title="Image Prep" description="">
       <WorkspaceClient initialSession={session} />
     </ModuleFrame>
   );
