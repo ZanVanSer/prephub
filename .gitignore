@@ -4,9 +4,17 @@ node_modules/
 out/
 dist/
 coverage/
+.vercel/
+.turbo/
 *.log
 .env*
 !.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
 
 AGENTS.md
 prep-docs/
