@@ -18,14 +18,14 @@ export const TOOL_MODULES: ToolModule[] = [
     href: "/image-prep",
     label: "Image Prep",
     shortLabel: "Image Prep",
-    description: "Prepare and export optimized email assets.",
+    description: "Prepare email and newsletter images with ready-to-use export presets.",
     icon: "image"
   },
   {
     href: "/mj-tool",
-    label: "MJ Tool",
-    shortLabel: "MJ Tool",
-    description: "Build, preview, and analyze MJML emails.",
+    label: "MJML Tool",
+    shortLabel: "MJML Tool",
+    description: "Build, preview, convert, and review MJML email templates in one place.",
     icon: "mail"
   }
 ];

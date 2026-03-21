@@ -11,7 +11,7 @@ export const DEFAULT_HTML = `<!DOCTYPE html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MJ Tool HTML Preview</title>
+    <title>MJML Tool HTML Preview</title>
   </head>
   <body style="margin:0;padding:32px;background:#f8fafc;font-family:Arial,sans-serif;color:#0f172a;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:24px;overflow:hidden;">
@@ -46,7 +46,7 @@ export const DEFAULT_MJML = `<mjml>
           font-family="Helvetica, Arial, sans-serif"
           color="#475569"
         >
-          MJ Tool helps you preview, inspect, and prepare production HTML
+          MJML Tool helps you preview, inspect, and prepare production HTML
           without leaving your workflow.
         </mj-text>
         <mj-button

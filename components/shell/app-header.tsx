@@ -1,41 +1,55 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { BellIcon, SettingsIcon } from "@/components/ui/icons";
-import { getSupabaseBrowserClient } from "@/lib/auth/supabase-browser";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { BellIcon, SearchIcon, SettingsIcon, UserIcon } from "@/components/ui/icons";
 
 export function AppHeader({ userEmail }: { userEmail: string }) {
+  const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchValue = searchParams.get("q") ?? "";
 
-  async function handleLogout() {
-    const supabase = getSupabaseBrowserClient();
-    await supabase.auth.signOut();
-    router.replace("/login");
-    router.refresh();
+  function handleSearchChange(value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value.trim()) {
+      params.set("q", value);
+    } else {
+      params.delete("q");
+    }
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
   }
 
   return (
     <header className="app-header">
-      <div className="search-shell">
-        <span className="search-shell__icon">⌕</span>
-        <span className="search-shell__text">Search tools or projects…</span>
-      </div>
+      <label className="search-shell" aria-label="Search tools or projects">
+        <span className="search-shell__icon">
+          <SearchIcon />
+        </span>
+        <input
+          className="search-shell__input"
+          type="search"
+          placeholder="Search tools or projects..."
+          value={searchValue}
+          onChange={(event) => handleSearchChange(event.target.value)}
+        />
+      </label>
 
       <div className="app-header__actions">
         <button type="button" className="icon-button" aria-label="Notifications">
           <BellIcon />
         </button>
-        <button type="button" className="icon-button" aria-label="Settings">
+        <Link href="/settings" className="icon-button" aria-label="Settings">
           <SettingsIcon />
+        </Link>
+        <button type="button" className="user-pill" aria-label={userEmail} title={userEmail}>
+          <span className="user-pill__avatar">
+            <UserIcon />
+          </span>
         </button>
-        <div className="user-pill">
-          <span className="user-pill__avatar">{userEmail.slice(0, 1).toUpperCase()}</span>
-          <span className="user-pill__email">{userEmail}</span>
-        </div>
-        <Button onClick={handleLogout}>
-          Logout
-        </Button>
       </div>
     </header>
   );

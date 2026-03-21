@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { TOOL_MODULES } from "@/lib/design/modules";
-import { DashboardIcon, ImageIcon, MailIcon, MenuIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DashboardIcon,
+  ImageIcon,
+  LogoutIcon,
+  MailIcon
+} from "@/components/ui/icons";
+import { getSupabaseBrowserClient } from "@/lib/auth/supabase-browser";
 
 function NavGlyph({ icon }: { icon: (typeof TOOL_MODULES)[number]["icon"] }) {
   if (icon === "image") {
@@ -20,26 +29,21 @@ function NavGlyph({ icon }: { icon: (typeof TOOL_MODULES)[number]["icon"] }) {
 
 export function SidebarClient() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  async function handleLogout() {
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    router.replace("/login");
+    router.refresh();
+  }
 
   return (
     <aside className={isCollapsed ? "app-sidebar app-sidebar--collapsed" : "app-sidebar"}>
       <div className="app-sidebar__top">
-        <button
-          type="button"
-          className="sidebar-toggle"
-          onClick={() => setIsCollapsed((current) => !current)}
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <MenuIcon />
-        </button>
-
         <div className={isCollapsed ? "app-brand sr-only" : "app-brand"}>
-          <div className="app-brand__mark">T</div>
-          <div>
-            <p className="app-brand__title">ToolHub</p>
-            <p className="app-brand__subtitle">Creative Suite</p>
-          </div>
+          <p className="app-brand__title">ToolHub</p>
         </div>
       </div>
 
@@ -65,6 +69,32 @@ export function SidebarClient() {
           );
         })}
       </nav>
+
+      <div className="app-sidebar__bottom">
+        <div className="app-sidebar__meta">
+          <Button
+            variant="secondary"
+            className="sidebar-link sidebar-link--subtle sidebar-link--button"
+            onClick={handleLogout}
+            title={isCollapsed ? "Logout" : undefined}
+            aria-label="Logout"
+          >
+            <span className="sidebar-link__icon">
+              <LogoutIcon />
+            </span>
+            {!isCollapsed ? <span>Logout</span> : null}
+          </Button>
+        </div>
+
+        <button
+          type="button"
+          className="sidebar-collapse"
+          onClick={() => setIsCollapsed((current) => !current)}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        </button>
+      </div>
     </aside>
   );
 }

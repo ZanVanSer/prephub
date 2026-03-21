@@ -8,7 +8,6 @@ export default async function LoginPage() {
   if (!hasSupabasePublicEnv()) {
     return (
       <ImprepAuthScreen
-        icon="th"
         title="Set up Supabase to continue"
         description="Add the public Supabase environment variables to enable login and protected modules."
       />
@@ -26,9 +25,8 @@ export default async function LoginPage() {
 
   return (
     <ImprepAuthScreen
-      icon="th"
       title="Welcome to ToolHub"
-      description="Sign in with your workspace credentials to access Image Prep and MJ Tool."
+      description="Sign in with your workspace credentials to access Image Prep and MJML Tool."
     >
       <LoginForm />
     </ImprepAuthScreen>

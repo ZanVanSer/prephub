@@ -9,7 +9,7 @@ export default function MjToolLayout({
 }>) {
   return (
     <ToastProvider>
-      <ModuleFrame title="MJ Tool" description="">
+      <ModuleFrame title="MJML Tool" description="">
         <MjToolNav />
         {children}
       </ModuleFrame>

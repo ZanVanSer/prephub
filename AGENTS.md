@@ -46,6 +46,16 @@ Build a modular SaaS dashboard application (ToolHub) using Next.js that integrat
 - Sidebar must support:
   - Expanded (icons + labels)
   - Collapsed (icons only with tooltips)
+  
+### UI Rules
+
+- Always reuse existing components
+- Do NOT create new button styles
+- Use segmented button group for:
+  - presets
+  - modes
+  - filters
+- Avoid adding headers unless strictly necessary
 
 ### Design Principles
 - Consistency over creativity
