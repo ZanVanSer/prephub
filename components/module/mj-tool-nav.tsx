@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MJ_TOOL_TABS } from "@/lib/design/modules";
+import { MJ_TOOL_TABS } from "@/lib/modules/access";
 
 export function MjToolNav() {
   const pathname = usePathname();

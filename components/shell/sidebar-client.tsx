@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { TOOL_MODULES } from "@/lib/design/modules";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeftIcon,
@@ -11,11 +10,13 @@ import {
   DashboardIcon,
   ImageIcon,
   LogoutIcon,
-  MailIcon
+  MailIcon,
+  SettingsIcon
 } from "@/components/ui/icons";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabase-browser";
+import type { AppModuleView } from "@/lib/modules/access";
 
-function NavGlyph({ icon }: { icon: (typeof TOOL_MODULES)[number]["icon"] }) {
+function NavGlyph({ icon }: { icon: AppModuleView["icon"] }) {
   if (icon === "image") {
     return <ImageIcon />;
   }
@@ -24,10 +25,14 @@ function NavGlyph({ icon }: { icon: (typeof TOOL_MODULES)[number]["icon"] }) {
     return <MailIcon />;
   }
 
+  if (icon === "settings") {
+    return <SettingsIcon />;
+  }
+
   return <DashboardIcon />;
 }
 
-export function SidebarClient() {
+export function SidebarClient({ navModules }: { navModules: AppModuleView[] }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -48,7 +53,7 @@ export function SidebarClient() {
       </div>
 
       <nav className="app-sidebar__nav" aria-label="Primary">
-        {TOOL_MODULES.map((item) => {
+        {navModules.map((item) => {
           const isActive =
             item.href === "/dashboard"
               ? pathname === "/dashboard"

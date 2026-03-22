@@ -1,7 +1,12 @@
-import { redirect } from "next/navigation";
 import { AppShell } from "@/components/shell/app-shell";
 import { hasSupabasePublicEnv } from "@/lib/auth/supabase-config";
-import { getSupabaseServerClient } from "@/lib/auth/supabase-server";
+import { requireActiveUser } from "@/lib/auth/access";
+import { toModuleView } from "@/lib/modules/access";
+import {
+  canAccessModuleForProfile,
+  getVisibleNavigationModulesForProfile
+} from "@/lib/modules/access-server";
+import { redirect } from "next/navigation";
 
 export default async function ProtectedAppLayout({
   children
@@ -12,14 +17,17 @@ export default async function ProtectedAppLayout({
     redirect("/login");
   }
 
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const accessContext = await requireActiveUser();
+  const navModules = (await getVisibleNavigationModulesForProfile(accessContext.profile)).map(toModuleView);
+  const canAccessSettings = await canAccessModuleForProfile(accessContext.profile, "settings");
 
-  if (!user) {
-    redirect("/login");
-  }
-
-  return <AppShell userEmail={user.email ?? "Workspace user"}>{children}</AppShell>;
+  return (
+    <AppShell
+      userEmail={accessContext.user.email ?? "Workspace user"}
+      navModules={navModules}
+      canAccessSettings={canAccessSettings}
+    >
+      {children}
+    </AppShell>
+  );
 }
