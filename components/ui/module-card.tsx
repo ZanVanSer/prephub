@@ -1,8 +1,8 @@
-import type { ToolModule } from "@/lib/design/modules";
-import { DashboardIcon, ImageIcon, MailIcon } from "@/components/ui/icons";
+import type { AppModuleView } from "@/lib/modules/access";
+import { DashboardIcon, ImageIcon, MailIcon, SettingsIcon } from "@/components/ui/icons";
 import { ButtonLink } from "@/components/ui/button";
 
-function ModuleGlyph({ icon }: { icon: ToolModule["icon"] }) {
+function ModuleGlyph({ icon }: { icon: AppModuleView["icon"] }) {
   if (icon === "image") {
     return <ImageIcon />;
   }
@@ -11,10 +11,14 @@ function ModuleGlyph({ icon }: { icon: ToolModule["icon"] }) {
     return <MailIcon />;
   }
 
+  if (icon === "settings") {
+    return <SettingsIcon />;
+  }
+
   return <DashboardIcon />;
 }
 
-export function ModuleCard({ module }: { module: ToolModule }) {
+export function ModuleCard({ module }: { module: AppModuleView }) {
   return (
     <article className="tool-card">
       <div className="tool-card__icon">

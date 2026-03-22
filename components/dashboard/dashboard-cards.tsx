@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useSyncExternalStore } from "react";
+import type { AppModuleView } from "@/lib/modules/access";
 import {
   ChartIcon,
   FolderIcon,
   ImageIcon,
   MailIcon,
+  SettingsIcon,
   SparklesIcon
 } from "@/components/ui/icons";
 import {
@@ -15,32 +17,6 @@ import {
   readShowDemoToolsPreference,
   subscribeShowDemoToolsPreference
 } from "@/lib/dashboard-preferences";
-
-const topCards = [
-  {
-    title: "Image Prep",
-    label: "Utility",
-    description: "Prepare email and newsletter images with ready-to-use export presets.",
-    href: "/image-prep",
-    icon: <ImageIcon />,
-    isDemo: false
-  },
-  {
-    title: "MJML Tool",
-    label: "Utility",
-    description: "Build, preview, convert, and review MJML email templates in one place.",
-    href: "/mj-tool",
-    icon: <MailIcon />,
-    isDemo: false
-  },
-  {
-    title: "Asset Manager",
-    label: "Core",
-    description: "Centralized hub for tagging, versioning, and distributing project deliverables.",
-    icon: <FolderIcon />,
-    isDemo: true
-  }
-] as const;
 
 const demoCards = [
   {
@@ -53,11 +29,42 @@ const demoCards = [
   }
 ] as const;
 
+type DashboardCardItem = {
+  title: string;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  isDemo: boolean;
+  href?: string;
+};
+
 function matchesSearch(value: string, query: string) {
   return value.toLowerCase().includes(query);
 }
 
-export function DashboardCards() {
+function getModuleIcon(icon: AppModuleView["icon"]) {
+  if (icon === "image") {
+    return <ImageIcon />;
+  }
+
+  if (icon === "mail") {
+    return <MailIcon />;
+  }
+
+  if (icon === "settings") {
+    return <SettingsIcon />;
+  }
+
+  return <FolderIcon />;
+}
+
+export function DashboardCards({
+  userEmail,
+  modules
+}: {
+  userEmail: string;
+  modules: AppModuleView[];
+}) {
   const searchParams = useSearchParams();
   const searchQuery = (searchParams.get("q") ?? "").trim().toLowerCase();
   const showDemoTools = useSyncExternalStore(
@@ -65,6 +72,24 @@ export function DashboardCards() {
     readShowDemoToolsPreference,
     () => DEFAULT_SHOW_DEMO_TOOLS
   );
+
+  const topCards: DashboardCardItem[] = [
+    ...modules.map((module) => ({
+      title: module.label,
+      label: "Utility",
+      description: module.description,
+      href: module.href,
+      icon: getModuleIcon(module.icon),
+      isDemo: false
+    })),
+    {
+      title: "Asset Manager",
+      label: "Core",
+      description: "Centralized hub for tagging, versioning, and distributing project deliverables.",
+      icon: <FolderIcon />,
+      isDemo: true
+    }
+  ];
 
   const visibleTopCards = topCards
     .filter((card) => showDemoTools || !card.isDemo)
@@ -84,7 +109,7 @@ export function DashboardCards() {
     <section className="dashboard-shell">
       <div className="dashboard-heading">
         <div>
-          <h1 className="dashboard-heading__title">Welcome back, User!</h1>
+          <h1 className="dashboard-heading__title">Welcome back, {userEmail}!</h1>
           <p className="dashboard-heading__subtitle">
             Your creative pipeline is ready. What would you like to build today?
           </p>

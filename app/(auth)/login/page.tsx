@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { ImprepAuthScreen } from "@/components/auth/imprep-auth-screen";
 import { LoginForm } from "@/components/auth/login-form";
+import { getAccessContext } from "@/lib/auth/access";
 import { hasSupabasePublicEnv } from "@/lib/auth/supabase-config";
-import { getSupabaseServerClient } from "@/lib/auth/supabase-server";
 
 export default async function LoginPage() {
   if (!hasSupabasePublicEnv()) {
@@ -14,13 +14,10 @@ export default async function LoginPage() {
     );
   }
 
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const accessContext = await getAccessContext();
 
-  if (user) {
-    redirect("/dashboard");
+  if (accessContext) {
+    redirect(accessContext.profile.status === "disabled" ? "/access-disabled" : "/dashboard");
   }
 
   return (

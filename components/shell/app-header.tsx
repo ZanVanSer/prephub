@@ -4,7 +4,13 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BellIcon, SearchIcon, SettingsIcon, UserIcon } from "@/components/ui/icons";
 
-export function AppHeader({ userEmail }: { userEmail: string }) {
+export function AppHeader({
+  userEmail,
+  canAccessSettings
+}: {
+  userEmail: string;
+  canAccessSettings: boolean;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,9 +48,11 @@ export function AppHeader({ userEmail }: { userEmail: string }) {
         <button type="button" className="icon-button" aria-label="Notifications">
           <BellIcon />
         </button>
-        <Link href="/settings" className="icon-button" aria-label="Settings">
-          <SettingsIcon />
-        </Link>
+        {canAccessSettings ? (
+          <Link href="/settings" className="icon-button" aria-label="Settings">
+            <SettingsIcon />
+          </Link>
+        ) : null}
         <button type="button" className="user-pill" aria-label={userEmail} title={userEmail}>
           <span className="user-pill__avatar">
             <UserIcon />
