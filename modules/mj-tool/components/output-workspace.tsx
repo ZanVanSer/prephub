@@ -148,7 +148,7 @@ export function OutputWorkspace() {
 
   return (
     <section className="space-y-5">
-      <div className="border border-[var(--color-border)] bg-white p-6">
+      <div className="surface-card">
         <div className="flex flex-col gap-6">
           <OutputTabs
             activeTab={activeTab}
@@ -166,7 +166,7 @@ export function OutputWorkspace() {
           />
 
           {actionError ? (
-            <div className="rounded-[6px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <div className="rounded-[20px] bg-[rgba(187,91,101,0.12)] px-4 py-3 text-sm text-[var(--danger)]">
               {actionError}
             </div>
           ) : null}
@@ -177,7 +177,7 @@ export function OutputWorkspace() {
             <button
               type="button"
               onClick={handleOpenExternal}
-              className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
+              className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
             >
               Open in External Editor
               <span aria-hidden="true">↗</span>
@@ -186,9 +186,9 @@ export function OutputWorkspace() {
         </div>
       </div>
 
-      <div className="text-[15px] leading-6 text-slate-500">
-        Need a fresh conversion first? Return to the{" "}
-        <Link href="/" className="font-medium text-[var(--color-brand)] hover:text-[var(--color-brand-strong)]">
+      <div className="text-[15px] leading-6 text-[var(--text-secondary)]">
+        Return to the{" "}
+        <Link href="/mj-tool" className="text-[var(--primary)]">
           editor
         </Link>
         .

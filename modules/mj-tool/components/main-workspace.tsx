@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { EditorPanel } from "@/modules/mj-tool/components/editor-panel";
 import { PreviewPanel } from "@/modules/mj-tool/components/preview-panel";
 import { useToast } from "@/modules/mj-tool/components/toast-provider";
@@ -114,34 +115,20 @@ export function MainWorkspace() {
   }
 
   return (
-    <section>
+    <section className="mj-workspace">
       <div className="mb-5 flex lg:hidden">
-        <div className="inline-flex overflow-hidden rounded-[6px] border border-[var(--color-border)] bg-white text-sm text-slate-600">
-          <button
-            type="button"
-            onClick={() => setMobilePane("editor")}
-            className={`px-4 py-2.5 transition-colors ${
-              mobilePane === "editor"
-                ? "bg-slate-900 text-white"
-                : "hover:bg-slate-50 hover:text-slate-900"
-            }`}
-          >
-            Editor
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobilePane("preview")}
-            className={`border-l border-[var(--color-border)] px-4 py-2.5 transition-colors ${
-              mobilePane === "preview"
-                ? "bg-slate-900 text-white"
-                : "hover:bg-slate-50 hover:text-slate-900"
-            }`}
-          >
-            Preview
-          </button>
-        </div>
+        <SegmentedControl
+          items={[
+            { value: "editor", label: "Editor" },
+            { value: "preview", label: "Preview" },
+          ]}
+          value={mobilePane}
+          onChange={setMobilePane}
+          groupClassName="mj-mobile-toggle"
+          className="mj-mobile-toggle__button"
+        />
       </div>
-      <div className="grid gap-8 xl:grid-cols-2">
+      <div className="mj-split-grid">
         <div className={mobilePane === "preview" ? "hidden lg:block" : ""}>
           <EditorPanel
             code={mjml}

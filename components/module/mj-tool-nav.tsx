@@ -8,7 +8,7 @@ export function MjToolNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="module-tabs" aria-label="MJ Tool">
+    <nav className="module-tabs" aria-label="MJML Tool">
       {MJ_TOOL_TABS.map((item) => {
         const isActive = item.href === "/mj-tool" ? pathname === item.href : pathname.startsWith(item.href);
 

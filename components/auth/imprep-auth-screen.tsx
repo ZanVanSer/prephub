@@ -1,19 +1,19 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from "react";
+import { DashboardIcon } from "@/components/ui/icons";
 
 interface AuthScreenProps {
   title: string;
   description: string;
-  icon: string;
   children?: ReactNode;
 }
 
-export function ImprepAuthScreen({ title, description, icon, children }: AuthScreenProps) {
+export function ImprepAuthScreen({ title, description, children }: AuthScreenProps) {
   return (
     <main className="auth-shell">
       <section className="auth-card">
         <div className="auth-brand">
           <span className="auth-brand-mark" aria-hidden="true">
-            {icon}
+            <DashboardIcon />
           </span>
           <strong>ToolHub</strong>
         </div>

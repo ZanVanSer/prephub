@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SurfaceCard } from "@/components/ui/surface-card";
 import { AnalysisCategoryCard } from "@/modules/mj-tool/components/analyzer/analysis-category-card";
 import { AnalysisEmptyState } from "@/modules/mj-tool/components/analyzer/analysis-empty-state";
 import { AnalysisStatCard } from "@/modules/mj-tool/components/analyzer/analysis-stat-card";
@@ -121,55 +124,30 @@ export function AnalyzeWorkspace() {
 
   return (
     <section>
-      <div className="flex flex-col gap-6 border border-[var(--color-border)] bg-white p-6">
-        <div className="flex flex-wrap items-center gap-0 self-start overflow-hidden rounded-[6px] border border-[var(--color-border)]">
-          <button
-            type="button"
-            onClick={() => setSource("mjml")}
-            disabled={!mjmlHtml}
-            className={`px-4 py-2.5 text-[14px] transition-colors ${
-              source === "mjml"
-                ? "bg-slate-900 text-white"
-                : "bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:text-slate-300"
-            }`}
-          >
-            MJML Preview
-          </button>
-          <button
-            type="button"
-            onClick={() => setSource("html")}
-            disabled={!htmlPreviewSource}
-            className={`border-l border-[var(--color-border)] px-4 py-2.5 text-[14px] transition-colors ${
-              source === "html"
-                ? "bg-slate-900 text-white"
-                : "bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:text-slate-300"
-            }`}
-          >
-            HTML Preview
-          </button>
-        </div>
+      <SurfaceCard className="flex flex-col gap-6">
+        <SegmentedControl
+          items={[
+            { value: "mjml", label: "MJML Preview", disabled: !mjmlHtml },
+            { value: "html", label: "HTML Preview", disabled: !htmlPreviewSource },
+          ]}
+          value={source}
+          onChange={setSource}
+          groupClassName="self-start"
+        />
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-slate-950">
-              Analysis
-            </h1>
-            <p className="mt-1 text-[15px] leading-6 text-slate-500">
-              {timestamp ? `Last analyzed: ${timestamp}` : "Ready to analyze current HTML"}
-            </p>
-          </div>
-          <button
-            type="button"
+          <div className="text-[14px] text-[var(--text-secondary)]">{timestamp ? `Last analyzed: ${timestamp}` : ""}</div>
+          <Button
+            variant="primary"
             onClick={() => void runAnalysis()}
             disabled={isLoading || !html}
-            className="inline-flex items-center justify-center rounded-[6px] border border-slate-900 bg-slate-900 px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? "Running Analysis..." : "Re-run Analysis"}
-          </button>
+          </Button>
         </div>
 
         {requestError ? (
-          <div className="rounded-[6px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="rounded-[20px] bg-[rgba(187,91,101,0.12)] px-4 py-3 text-sm text-[var(--danger)]">
             {requestError}
           </div>
         ) : null}
@@ -202,14 +180,12 @@ export function AnalyzeWorkspace() {
         </div>
 
         <div className="flex items-center justify-between pt-2">
-          <h2 className="text-lg font-semibold text-slate-950">
-            Analysis Categories
-          </h2>
+          <div />
           <button
             type="button"
             onClick={toggleExpandAll}
             disabled={!analysis}
-            className="text-sm font-medium text-[var(--color-brand)] transition-colors hover:text-[var(--color-brand-strong)] disabled:cursor-not-allowed disabled:text-slate-300"
+            className="text-sm text-[var(--primary)] transition-colors disabled:cursor-not-allowed disabled:text-slate-300"
           >
             {analysis && expandedIds.length === analysis.categories.length
               ? "Collapse All"
@@ -222,7 +198,7 @@ export function AnalyzeWorkspace() {
               ? Array.from({ length: 3 }, (_, index) => (
                 <div
                   key={index}
-                  className="h-24 animate-pulse border border-slate-200 bg-white"
+                  className="h-24 animate-pulse rounded-[24px] bg-[var(--surface-low)]"
                 />
               ))
               : analysis?.categories.map((category) => (
@@ -234,7 +210,7 @@ export function AnalyzeWorkspace() {
                 />
               ))}
         </div>
-      </div>
+      </SurfaceCard>
     </section>
   );
 }

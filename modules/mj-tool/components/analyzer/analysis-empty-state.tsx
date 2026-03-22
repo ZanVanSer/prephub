@@ -1,24 +1,13 @@
-import Link from "next/link";
+import { ButtonLink } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SurfaceCard } from "@/components/ui/surface-card";
 
 export function AnalysisEmptyState() {
   return (
     <section>
-      <div className="border border-[var(--color-border)] bg-white p-8">
-        <div className="max-w-xl space-y-4">
-          <h1 className="text-[28px] font-semibold tracking-[-0.02em] text-slate-950">
-            Nothing to analyze yet.
-          </h1>
-          <p className="text-[15px] leading-7 text-slate-500">
-            Refresh the MJML preview first so we have generated HTML to inspect.
-          </p>
-          <Link
-            href="/"
-            className="inline-flex items-center rounded-[6px] border border-slate-900 bg-slate-900 px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-slate-800"
-          >
-            Back to Editor
-          </Link>
-        </div>
-      </div>
+      <SurfaceCard>
+        <EmptyState title="Nothing to analyze" action={<ButtonLink href="/mj-tool" variant="primary">Back to editor</ButtonLink>} />
+      </SurfaceCard>
     </section>
   );
 }

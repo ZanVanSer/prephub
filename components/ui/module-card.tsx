@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { ToolModule } from "@/lib/design/modules";
 import { DashboardIcon, ImageIcon, MailIcon } from "@/components/ui/icons";
+import { ButtonLink } from "@/components/ui/button";
 
 function ModuleGlyph({ icon }: { icon: ToolModule["icon"] }) {
   if (icon === "image") {
@@ -26,9 +26,9 @@ export function ModuleCard({ module }: { module: ToolModule }) {
           <h2 className="tool-card__title">{module.label}</h2>
           <p className="tool-card__description">{module.description}</p>
         </div>
-        <Link href={module.href} className="button button--secondary self-start">
+        <ButtonLink href={module.href} className="self-start">
           Open
-        </Link>
+        </ButtonLink>
       </div>
     </article>
   );

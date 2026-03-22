@@ -1,3 +1,5 @@
+import { SegmentedControl } from "@/components/ui/segmented-control";
+
 type OutputTab = "generated" | "minified";
 
 type OutputTabsProps = {
@@ -12,41 +14,17 @@ export function OutputTabs({
   minifiedReady,
 }: OutputTabsProps) {
   return (
-    <div className="flex flex-wrap items-center gap-6 border-b border-slate-200 pb-3.5">
-      <button
-        type="button"
-        onClick={() => onTabChange("generated")}
-        className={`relative pb-2 text-[15px] font-medium transition-colors ${
-          activeTab === "generated"
-            ? "text-slate-950"
-            : "text-slate-500 hover:text-slate-800"
-        }`}
-      >
-        Generated HTML
-        {activeTab === "generated" ? (
-          <span className="absolute inset-x-0 -bottom-[13px] h-0.5 bg-[var(--color-brand)]" />
-        ) : null}
-      </button>
-
-      <button
-        type="button"
-        onClick={() => onTabChange("minified")}
-        className={`relative pb-2 text-[15px] font-medium transition-colors ${
-          activeTab === "minified"
-            ? "text-slate-950"
-            : "text-slate-500 hover:text-slate-800"
-        }`}
-      >
-        Minified HTML
-        {!minifiedReady ? (
-          <span className="ml-2 border border-[var(--color-border)] bg-slate-50 px-2 py-0.5 text-[11px] text-slate-500">
-            create first
-          </span>
-        ) : null}
-        {activeTab === "minified" ? (
-          <span className="absolute inset-x-0 -bottom-[13px] h-0.5 bg-[var(--color-brand)]" />
-        ) : null}
-      </button>
-    </div>
+    <SegmentedControl
+      items={[
+        { value: "generated", label: "Generated HTML" },
+        {
+          value: "minified",
+          label: "Minified HTML",
+          count: minifiedReady ? undefined : "new",
+        },
+      ]}
+      value={activeTab}
+      onChange={onTabChange}
+    />
   );
 }
