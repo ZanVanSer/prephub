@@ -1,7 +1,13 @@
 import type { AccessProfile } from "@/lib/auth/access";
 import type { UserPlan, UserRole } from "@/lib/auth/access";
 
-export type AppModuleId = "dashboard" | "image-prep" | "mj-tool" | "settings" | "admin";
+export type AppModuleId =
+  | "dashboard"
+  | "image-prep"
+  | "background-remover"
+  | "mj-tool"
+  | "settings"
+  | "admin";
 
 export type ModuleIcon = "dashboard" | "image" | "mail" | "settings";
 export type ModuleCategory = "platform" | "tool";
@@ -70,6 +76,21 @@ export const APP_MODULES: AppModuleDefinition[] = [
     showOnDashboard: true
   },
   {
+    id: "background-remover",
+    href: "/background-remover",
+    label: "BG Remover",
+    shortLabel: "BG Remover",
+    description: "Upload one image, remove the background, and download a transparent PNG result.",
+    icon: "image",
+    category: "tool",
+    isImplemented: true,
+    isRoleConfigurable: true,
+    isGlobalConfigurable: true,
+    isCritical: false,
+    showInSidebar: true,
+    showOnDashboard: true
+  },
+  {
     id: "mj-tool",
     href: "/mj-tool",
     label: "MJML Tool",
@@ -120,12 +141,12 @@ export const DEFAULT_ROLE_CONFIGS: RoleConfig[] = [
   {
     role: "basic",
     plan: "basic",
-    moduleIds: ["image-prep", "mj-tool", "settings"]
+    moduleIds: ["image-prep", "background-remover", "mj-tool", "settings"]
   },
   {
     role: "admin",
     plan: "basic",
-    moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+    moduleIds: ["image-prep", "background-remover", "mj-tool", "settings", "admin"]
   }
 ];
 
