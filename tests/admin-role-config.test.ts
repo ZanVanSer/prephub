@@ -28,7 +28,7 @@ const baseProfile: AccessProfile = {
 test("role-configurable modules come from the module registry and exclude dashboard", () => {
   assert.deepEqual(
     getRoleConfigurableModules().map((module) => module.id),
-    ["image-prep", "mj-tool", "settings", "admin"]
+    ["image-prep", "background-remover", "mj-tool", "settings", "admin"]
   );
 });
 
@@ -36,11 +36,11 @@ test("validateRoleConfigUpdate accepts supported plans and module ids", () => {
   assert.deepEqual(
     validateRoleConfigUpdate({
       plan: "basic",
-      moduleIds: ["image-prep", "settings"]
+      moduleIds: ["image-prep", "background-remover", "settings"]
     }),
     {
       plan: "basic",
-      moduleIds: ["image-prep", "settings"]
+      moduleIds: ["image-prep", "background-remover", "settings"]
     }
   );
 });
@@ -64,12 +64,12 @@ test("assertRoleConfigUpdateAllowed protects admin role access", () => {
         currentConfig: {
           role: "admin",
           plan: "basic",
-          moduleIds: ["image-prep", "admin"]
+          moduleIds: ["image-prep", "background-remover", "admin"]
         },
         nextConfig: {
           role: "admin",
           plan: "basic",
-          moduleIds: ["image-prep"]
+          moduleIds: ["image-prep", "background-remover"]
         }
       }),
     /Admin role must retain Admin module access/
@@ -109,13 +109,14 @@ test("module access follows persisted role configuration", () => {
     {
       role: "admin",
       plan: "basic",
-      moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+      moduleIds: ["image-prep", "background-remover", "mj-tool", "settings", "admin"]
     }
   ];
 
   assert.equal(canAccessModuleWithRoleConfigs(baseProfile, "dashboard", roleConfigs), true);
   assert.equal(canAccessModuleWithRoleConfigs(baseProfile, "settings", roleConfigs), true);
   assert.equal(canAccessModuleWithRoleConfigs(baseProfile, "image-prep", roleConfigs), false);
+  assert.equal(canAccessModuleWithRoleConfigs(baseProfile, "background-remover", roleConfigs), false);
   assert.deepEqual(
     getVisibleNavigationModulesWithRoleConfigs(baseProfile, roleConfigs).map((module) => module.id),
     ["dashboard"]

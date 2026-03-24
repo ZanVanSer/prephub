@@ -131,11 +131,11 @@ test("module access summary follows the central module registry", () => {
   assert.deepEqual(getAdminModuleAccessSummary(), [
     {
       role: "basic",
-      modules: ["Dashboard", "Image Prep", "MJML Tool", "Settings"]
+      modules: ["Dashboard", "Image Prep", "Background Remover", "MJML Tool", "Settings"]
     },
     {
       role: "admin",
-      modules: ["Dashboard", "Image Prep", "MJML Tool", "Settings", "Admin"]
+      modules: ["Dashboard", "Image Prep", "Background Remover", "MJML Tool", "Settings", "Admin"]
     }
   ]);
 });

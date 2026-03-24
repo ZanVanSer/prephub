@@ -42,6 +42,7 @@ test("default profile provisioning shape matches the platform defaults", () => {
 test("basic users can access the current platform modules", () => {
   assert.equal(canAccessModule(baseProfile, "dashboard"), true);
   assert.equal(canAccessModule(baseProfile, "image-prep"), true);
+  assert.equal(canAccessModule(baseProfile, "background-remover"), true);
   assert.equal(canAccessModule(baseProfile, "mj-tool"), true);
   assert.equal(canAccessModule(baseProfile, "settings"), true);
 });
@@ -67,12 +68,12 @@ test("admin users see admin in navigation and dashboard visibility", () => {
 
   assert.deepEqual(
     getVisibleNavigationModules(adminProfile).map((module) => module.id),
-    ["dashboard", "image-prep", "mj-tool", "admin"]
+    ["dashboard", "image-prep", "background-remover", "mj-tool", "admin"]
   );
 
   assert.deepEqual(
     getVisibleDashboardModules(adminProfile).map((module) => module.id),
-    ["image-prep", "mj-tool", "admin"]
+    ["image-prep", "background-remover", "mj-tool", "admin"]
   );
 });
 
@@ -84,6 +85,7 @@ test("disabled users are denied all module access", () => {
 
   assert.equal(canAccessModule(disabledProfile, "dashboard"), false);
   assert.equal(canAccessModule(disabledProfile, "image-prep"), false);
+  assert.equal(canAccessModule(disabledProfile, "background-remover"), false);
   assert.equal(canAccessModule(disabledProfile, "mj-tool"), false);
   assert.equal(canAccessModule(disabledProfile, "settings"), false);
   assert.equal(canAccessModule(disabledProfile, "admin"), false);
@@ -92,14 +94,14 @@ test("disabled users are denied all module access", () => {
 test("visible navigation excludes admin for basic users", () => {
   assert.deepEqual(
     getVisibleNavigationModules(baseProfile).map((module) => module.id),
-    ["dashboard", "image-prep", "mj-tool"]
+    ["dashboard", "image-prep", "background-remover", "mj-tool"]
   );
 });
 
 test("dashboard visibility follows access rules and excludes admin for basic users", () => {
   assert.deepEqual(
     getVisibleDashboardModules(baseProfile).map((module) => module.id),
-    ["image-prep", "mj-tool"]
+    ["image-prep", "background-remover", "mj-tool"]
   );
 });
 
@@ -125,12 +127,12 @@ test("globally disabled modules are denied even when the role allows access", ()
     {
       role: "basic",
       plan: "basic",
-      moduleIds: ["image-prep", "mj-tool", "settings"]
+      moduleIds: ["image-prep", "background-remover", "mj-tool", "settings"]
     },
     {
       role: "admin",
       plan: "basic",
-      moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+      moduleIds: ["image-prep", "background-remover", "mj-tool", "settings", "admin"]
     }
   ];
 
@@ -145,22 +147,22 @@ test("globally disabled modules are removed from navigation and dashboard visibi
     {
       role: "basic",
       plan: "basic",
-      moduleIds: ["image-prep", "mj-tool", "settings"]
+      moduleIds: ["image-prep", "background-remover", "mj-tool", "settings"]
     },
     {
       role: "admin",
       plan: "basic",
-      moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+      moduleIds: ["image-prep", "background-remover", "mj-tool", "settings", "admin"]
     }
   ];
 
   assert.deepEqual(
     getVisibleNavigationModulesWithConfigs(baseProfile, roleConfigs, moduleConfigs).map((module) => module.id),
-    ["dashboard", "mj-tool"]
+    ["dashboard", "background-remover", "mj-tool"]
   );
   assert.deepEqual(
     getVisibleDashboardModulesWithConfigs(baseProfile, roleConfigs, moduleConfigs).map((module) => module.id),
-    ["mj-tool"]
+    ["background-remover", "mj-tool"]
   );
 });
 
@@ -176,12 +178,12 @@ test("critical non-configurable modules remain enabled even if stored state says
     {
       role: "basic",
       plan: "basic",
-      moduleIds: ["image-prep", "mj-tool", "settings"]
+      moduleIds: ["image-prep", "background-remover", "mj-tool", "settings"]
     },
     {
       role: "admin",
       plan: "basic",
-      moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+      moduleIds: ["image-prep", "background-remover", "mj-tool", "settings", "admin"]
     }
   ];
 
