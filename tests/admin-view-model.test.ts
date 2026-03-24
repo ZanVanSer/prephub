@@ -55,4 +55,5 @@ test("filterAdminUsers combines role, plan, and status filters", () => {
 test("getAdminTabFromPathname resolves users and roles tabs", () => {
   assert.equal(getAdminTabFromPathname("/admin"), "users");
   assert.equal(getAdminTabFromPathname("/admin/roles"), "roles");
+  assert.equal(getAdminTabFromPathname("/admin/modules"), "modules");
 });

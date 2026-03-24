@@ -949,6 +949,34 @@ textarea {
   min-width: 290px;
 }
 
+.admin-module-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(73, 75, 214, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+  border: 0;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.admin-module-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.admin-module-action--danger {
+  background: rgba(187, 91, 101, 0.12);
+  color: var(--danger);
+}
+
 .admin-table__action-field {
   min-width: 92px;
   gap: 0;

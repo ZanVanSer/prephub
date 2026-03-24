@@ -1,4 +1,4 @@
-import type { UserPlan, UserRole } from "@/lib/auth/access";
+import type { UserRole } from "@/lib/auth/access";
 import { getSupabaseAdminClient } from "@/lib/auth/supabase-server";
 import {
   DEFAULT_ROLE_CONFIGS,
@@ -18,13 +18,6 @@ function assertServerOnly() {
     throw new Error("Admin role data helpers are server-only.");
   }
 }
-
-type RoleConfigRow = {
-  role: UserRole;
-  plan: UserPlan;
-  created_at: string;
-  updated_at: string;
-};
 
 export async function listAdminRoleConfigs() {
   assertServerOnly();

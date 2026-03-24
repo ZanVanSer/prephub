@@ -7,6 +7,7 @@ import {
   type AppModuleId
 } from "@/lib/modules/access";
 import type {
+  AdminModuleConfigUpdateInput,
   AdminModuleAccessSummary,
   AdminRoleConfigRecord,
   AdminRoleConfigUpdateInput,
@@ -126,6 +127,22 @@ export function validateRoleConfigUpdate(input: unknown): AdminRoleConfigUpdateI
   };
 }
 
+export function validateModuleConfigUpdate(input: unknown): AdminModuleConfigUpdateInput {
+  if (!input || typeof input !== "object") {
+    throw new Error("Invalid module configuration payload.");
+  }
+
+  const candidate = input as Record<string, unknown>;
+
+  if (typeof candidate.isEnabled !== "boolean") {
+    throw new Error("Invalid module enabled state.");
+  }
+
+  return {
+    isEnabled: candidate.isEnabled
+  };
+}
+
 export function assertRoleConfigUpdateAllowed(params: {
   role: UserRole;
   currentConfig: AdminRoleConfigRecord;
@@ -135,5 +152,25 @@ export function assertRoleConfigUpdateAllowed(params: {
 
   if (role === "admin" && !nextConfig.moduleIds.includes("admin")) {
     throw new Error("Admin role must retain Admin module access.");
+  }
+}
+
+export function assertModuleConfigUpdateAllowed(params: {
+  moduleId: AppModuleId;
+  nextConfig: AdminModuleConfigUpdateInput;
+}) {
+  const { moduleId, nextConfig } = params;
+  const appModule = APP_MODULES.find((entry) => entry.id === moduleId);
+
+  if (!appModule) {
+    throw new Error("Unknown module.");
+  }
+
+  if (!appModule.isImplemented) {
+    throw new Error("Only implemented modules can be configured.");
+  }
+
+  if (!appModule.isGlobalConfigurable && !nextConfig.isEnabled) {
+    throw new Error(`${appModule.label} must remain enabled.`);
   }
 }
