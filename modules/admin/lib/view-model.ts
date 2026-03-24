@@ -14,13 +14,26 @@ export const ADMIN_TABS: Array<{ href: string; id: AdminTabId; label: string }> 
     href: "/admin/roles",
     id: "roles",
     label: "Roles"
+  },
+  {
+    href: "/admin/modules",
+    id: "modules",
+    label: "Modules"
   }
 ];
 
 export const ADMIN_FILTER_ALL = "all" as const;
 
 export function getAdminTabFromPathname(pathname: string): AdminTabId {
-  return pathname.startsWith("/admin/roles") ? "roles" : "users";
+  if (pathname.startsWith("/admin/roles")) {
+    return "roles";
+  }
+
+  if (pathname.startsWith("/admin/modules")) {
+    return "modules";
+  }
+
+  return "users";
 }
 
 export function filterAdminUsers(users: AdminUserRecord[], filters: AdminUserFilters) {

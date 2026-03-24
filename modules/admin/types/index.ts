@@ -1,7 +1,7 @@
 import type { UserPlan, UserRole, UserStatus } from "@/lib/auth/access";
-import type { AppModuleId } from "@/lib/modules/access";
+import type { AppModuleId, ModuleCategory } from "@/lib/modules/access";
 
-export type AdminTabId = "users" | "roles";
+export type AdminTabId = "users" | "roles" | "modules";
 
 export type AdminUserRecord = {
   id: string;
@@ -35,6 +35,20 @@ export type AdminRoleConfigRecord = {
 export type AdminRoleConfigUpdateInput = {
   plan: UserPlan;
   moduleIds: AppModuleId[];
+};
+
+export type AdminModuleConfigRecord = {
+  moduleId: AppModuleId;
+  label: string;
+  description: string;
+  category: ModuleCategory;
+  isEnabled: boolean;
+  isCritical: boolean;
+  isGlobalConfigurable: boolean;
+};
+
+export type AdminModuleConfigUpdateInput = {
+  isEnabled: boolean;
 };
 
 export type AdminUserFilterValue<T extends string> = T | "all";

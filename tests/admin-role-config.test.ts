@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  assertModuleConfigUpdateAllowed,
   assertRoleConfigUpdateAllowed,
+  validateModuleConfigUpdate,
   validateRoleConfigUpdate
 } from "@/modules/admin/lib/contracts";
 import {
@@ -71,6 +73,29 @@ test("assertRoleConfigUpdateAllowed protects admin role access", () => {
         }
       }),
     /Admin role must retain Admin module access/
+  );
+});
+
+test("validateModuleConfigUpdate accepts supported boolean values", () => {
+  assert.deepEqual(validateModuleConfigUpdate({ isEnabled: false }), {
+    isEnabled: false
+  });
+});
+
+test("validateModuleConfigUpdate rejects invalid values", () => {
+  assert.throws(() => validateModuleConfigUpdate({ isEnabled: "false" }), /Invalid module enabled state/);
+});
+
+test("assertModuleConfigUpdateAllowed protects globally required modules", () => {
+  assert.throws(
+    () =>
+      assertModuleConfigUpdateAllowed({
+        moduleId: "admin",
+        nextConfig: {
+          isEnabled: false
+        }
+      }),
+    /Admin must remain enabled/
   );
 });
 

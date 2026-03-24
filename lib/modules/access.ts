@@ -4,6 +4,7 @@ import type { UserPlan, UserRole } from "@/lib/auth/access";
 export type AppModuleId = "dashboard" | "image-prep" | "mj-tool" | "settings" | "admin";
 
 export type ModuleIcon = "dashboard" | "image" | "mail" | "settings";
+export type ModuleCategory = "platform" | "tool";
 
 export type AppModuleDefinition = {
   id: AppModuleId;
@@ -12,8 +13,11 @@ export type AppModuleDefinition = {
   shortLabel: string;
   description: string;
   icon: ModuleIcon;
+  category: ModuleCategory;
   isImplemented: boolean;
   isRoleConfigurable: boolean;
+  isGlobalConfigurable: boolean;
+  isCritical: boolean;
   showInSidebar: boolean;
   showOnDashboard: boolean;
 };
@@ -29,6 +33,11 @@ export type RoleConfig = {
   moduleIds: AppModuleId[];
 };
 
+export type ModuleConfig = {
+  moduleId: AppModuleId;
+  isEnabled: boolean;
+};
+
 export const APP_MODULES: AppModuleDefinition[] = [
   {
     id: "dashboard",
@@ -37,8 +46,11 @@ export const APP_MODULES: AppModuleDefinition[] = [
     shortLabel: "Home",
     description: "Overview of your available tools.",
     icon: "dashboard",
+    category: "platform",
     isImplemented: true,
     isRoleConfigurable: false,
+    isGlobalConfigurable: false,
+    isCritical: true,
     showInSidebar: true,
     showOnDashboard: false
   },
@@ -49,8 +61,11 @@ export const APP_MODULES: AppModuleDefinition[] = [
     shortLabel: "Image Prep",
     description: "Prepare email and newsletter images with ready-to-use export presets.",
     icon: "image",
+    category: "tool",
     isImplemented: true,
     isRoleConfigurable: true,
+    isGlobalConfigurable: true,
+    isCritical: false,
     showInSidebar: true,
     showOnDashboard: true
   },
@@ -61,8 +76,11 @@ export const APP_MODULES: AppModuleDefinition[] = [
     shortLabel: "MJML Tool",
     description: "Build, preview, convert, and review MJML email templates in one place.",
     icon: "mail",
+    category: "tool",
     isImplemented: true,
     isRoleConfigurable: true,
+    isGlobalConfigurable: true,
+    isCritical: false,
     showInSidebar: true,
     showOnDashboard: true
   },
@@ -73,8 +91,11 @@ export const APP_MODULES: AppModuleDefinition[] = [
     shortLabel: "Settings",
     description: "Manage your workspace preferences and account-related settings.",
     icon: "settings",
+    category: "platform",
     isImplemented: true,
     isRoleConfigurable: true,
+    isGlobalConfigurable: true,
+    isCritical: true,
     showInSidebar: false,
     showOnDashboard: false
   },
@@ -85,8 +106,11 @@ export const APP_MODULES: AppModuleDefinition[] = [
     shortLabel: "Admin",
     description: "Manage users, access, and future platform controls.",
     icon: "settings",
+    category: "platform",
     isImplemented: true,
     isRoleConfigurable: true,
+    isGlobalConfigurable: false,
+    isCritical: true,
     showInSidebar: true,
     showOnDashboard: true
   }
@@ -104,6 +128,13 @@ export const DEFAULT_ROLE_CONFIGS: RoleConfig[] = [
     moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
   }
 ];
+
+export const DEFAULT_MODULE_CONFIGS: ModuleConfig[] = APP_MODULES.filter((appModule) => appModule.isImplemented).map(
+  (appModule) => ({
+    moduleId: appModule.id,
+    isEnabled: true
+  })
+);
 
 export const MJ_TOOL_TABS = [
   { href: "/mj-tool", label: "MJML Preview" },
@@ -127,6 +158,10 @@ function getRoleConfigMap(roleConfigs: RoleConfig[]) {
   return new Map(roleConfigs.map((config) => [config.role, config]));
 }
 
+function getModuleConfigMap(moduleConfigs: ModuleConfig[]) {
+  return new Map(moduleConfigs.map((config) => [config.moduleId, config]));
+}
+
 export function getRoleConfigurableModules() {
   return APP_MODULES.filter((appModule) => appModule.isImplemented && appModule.isRoleConfigurable);
 }
@@ -135,14 +170,49 @@ export function getRoleConfigurableModuleIds() {
   return getRoleConfigurableModules().map((appModule) => appModule.id);
 }
 
+export function getGlobalConfigurableModules() {
+  return APP_MODULES.filter((appModule) => appModule.isImplemented && appModule.isGlobalConfigurable);
+}
+
+export function getGlobalConfigurableModuleIds() {
+  return getGlobalConfigurableModules().map((appModule) => appModule.id);
+}
+
+export function isModuleGloballyEnabledWithConfigs(moduleId: AppModuleId, moduleConfigs: ModuleConfig[]) {
+  const appModule = getModuleById(moduleId);
+
+  if (!appModule.isImplemented) {
+    return false;
+  }
+
+  if (!appModule.isGlobalConfigurable) {
+    return true;
+  }
+
+  return getModuleConfigMap(moduleConfigs).get(moduleId)?.isEnabled ?? true;
+}
+
 export function canAccessModuleWithRoleConfigs(
   profile: AccessProfile,
   moduleId: AppModuleId,
   roleConfigs: RoleConfig[]
 ) {
+  return canAccessModuleWithConfigs(profile, moduleId, roleConfigs, DEFAULT_MODULE_CONFIGS);
+}
+
+export function canAccessModuleWithConfigs(
+  profile: AccessProfile,
+  moduleId: AppModuleId,
+  roleConfigs: RoleConfig[],
+  moduleConfigs: ModuleConfig[]
+) {
   const appModule = getModuleById(moduleId);
 
   if (profile.status !== "active" || !appModule.isImplemented) {
+    return false;
+  }
+
+  if (!isModuleGloballyEnabledWithConfigs(moduleId, moduleConfigs)) {
     return false;
   }
 
@@ -160,18 +230,26 @@ export function canAccessModuleWithRoleConfigs(
 }
 
 export function canAccessModule(profile: AccessProfile, moduleId: AppModuleId) {
-  return canAccessModuleWithRoleConfigs(profile, moduleId, DEFAULT_ROLE_CONFIGS);
+  return canAccessModuleWithConfigs(profile, moduleId, DEFAULT_ROLE_CONFIGS, DEFAULT_MODULE_CONFIGS);
 }
 
 export function getVisibleNavigationModulesWithRoleConfigs(
   profile: AccessProfile,
   roleConfigs: RoleConfig[]
 ) {
+  return getVisibleNavigationModulesWithConfigs(profile, roleConfigs, DEFAULT_MODULE_CONFIGS);
+}
+
+export function getVisibleNavigationModulesWithConfigs(
+  profile: AccessProfile,
+  roleConfigs: RoleConfig[],
+  moduleConfigs: ModuleConfig[]
+) {
   return APP_MODULES.filter(
     (module) =>
       module.isImplemented &&
       module.showInSidebar &&
-      canAccessModuleWithRoleConfigs(profile, module.id, roleConfigs)
+      canAccessModuleWithConfigs(profile, module.id, roleConfigs, moduleConfigs)
   );
 }
 
@@ -183,11 +261,19 @@ export function getVisibleDashboardModulesWithRoleConfigs(
   profile: AccessProfile,
   roleConfigs: RoleConfig[]
 ) {
+  return getVisibleDashboardModulesWithConfigs(profile, roleConfigs, DEFAULT_MODULE_CONFIGS);
+}
+
+export function getVisibleDashboardModulesWithConfigs(
+  profile: AccessProfile,
+  roleConfigs: RoleConfig[],
+  moduleConfigs: ModuleConfig[]
+) {
   return APP_MODULES.filter(
     (module) =>
       module.isImplemented &&
       module.showOnDashboard &&
-      canAccessModuleWithRoleConfigs(profile, module.id, roleConfigs)
+      canAccessModuleWithConfigs(profile, module.id, roleConfigs, moduleConfigs)
   );
 }
 

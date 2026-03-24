@@ -3,8 +3,14 @@ import test from "node:test";
 import { createDefaultProfileInput, type AccessProfile } from "@/lib/auth/access";
 import {
   canAccessModule,
+  canAccessModuleWithConfigs,
+  DEFAULT_MODULE_CONFIGS,
   getVisibleDashboardModules,
-  getVisibleNavigationModules
+  getVisibleDashboardModulesWithConfigs,
+  getVisibleNavigationModules,
+  getVisibleNavigationModulesWithConfigs,
+  type ModuleConfig,
+  type RoleConfig
 } from "@/lib/modules/access";
 
 const baseProfile: AccessProfile = {
@@ -109,4 +115,75 @@ test("settings visibility follows the same access rules as route protection", ()
     ),
     false
   );
+});
+
+test("globally disabled modules are denied even when the role allows access", () => {
+  const moduleConfigs: ModuleConfig[] = DEFAULT_MODULE_CONFIGS.map((config) =>
+    config.moduleId === "mj-tool" ? { ...config, isEnabled: false } : config
+  );
+  const roleConfigs: RoleConfig[] = [
+    {
+      role: "basic",
+      plan: "basic",
+      moduleIds: ["image-prep", "mj-tool", "settings"]
+    },
+    {
+      role: "admin",
+      plan: "basic",
+      moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+    }
+  ];
+
+  assert.equal(canAccessModuleWithConfigs(baseProfile, "mj-tool", roleConfigs, moduleConfigs), false);
+});
+
+test("globally disabled modules are removed from navigation and dashboard visibility", () => {
+  const moduleConfigs: ModuleConfig[] = DEFAULT_MODULE_CONFIGS.map((config) =>
+    config.moduleId === "image-prep" ? { ...config, isEnabled: false } : config
+  );
+  const roleConfigs: RoleConfig[] = [
+    {
+      role: "basic",
+      plan: "basic",
+      moduleIds: ["image-prep", "mj-tool", "settings"]
+    },
+    {
+      role: "admin",
+      plan: "basic",
+      moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+    }
+  ];
+
+  assert.deepEqual(
+    getVisibleNavigationModulesWithConfigs(baseProfile, roleConfigs, moduleConfigs).map((module) => module.id),
+    ["dashboard", "mj-tool"]
+  );
+  assert.deepEqual(
+    getVisibleDashboardModulesWithConfigs(baseProfile, roleConfigs, moduleConfigs).map((module) => module.id),
+    ["mj-tool"]
+  );
+});
+
+test("critical non-configurable modules remain enabled even if stored state says otherwise", () => {
+  const adminProfile: AccessProfile = {
+    ...baseProfile,
+    role: "admin"
+  };
+  const moduleConfigs: ModuleConfig[] = DEFAULT_MODULE_CONFIGS.map((config) =>
+    config.moduleId === "admin" ? { ...config, isEnabled: false } : config
+  );
+  const roleConfigs: RoleConfig[] = [
+    {
+      role: "basic",
+      plan: "basic",
+      moduleIds: ["image-prep", "mj-tool", "settings"]
+    },
+    {
+      role: "admin",
+      plan: "basic",
+      moduleIds: ["image-prep", "mj-tool", "settings", "admin"]
+    }
+  ];
+
+  assert.equal(canAccessModuleWithConfigs(adminProfile, "admin", roleConfigs, moduleConfigs), true);
 });
